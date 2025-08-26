@@ -267,7 +267,7 @@ body {
     right: 15px;
     width: 50px;
     height: 50px;
-    z-index: 9999;
+    z-index: 9998; /* menor que modal */
     cursor: pointer;
     transition: transform 0.3s;
 }
@@ -371,6 +371,30 @@ document.addEventListener('mousemove', e => {
 window.addEventListener('resize', () => {
   if (targetY > window.scrollY + window.innerHeight - 65) {
     targetY = window.scrollY + window.innerHeight - 65;
+  }
+});
+
+/* ==================== ESCONDER BOTÃO NO MODAL ==================== */
+const modal = document.getElementById('detalhesModal');
+const closeBtn = modal.querySelector('.close');
+
+// Funções abrir/fechar modal (ajuste no seu código de imóveis para usar estas)
+function abrirModal() {
+  modal.style.display = "block";
+  whatsapp.style.display = "none"; // 🔹 esconde
+}
+function fecharModal() {
+  modal.style.display = "none";
+  whatsapp.style.display = "block"; // 🔹 mostra
+}
+
+// Botão fechar do modal
+closeBtn.addEventListener("click", fecharModal);
+
+// Fecha clicando fora do conteúdo
+window.addEventListener("click", function(e) {
+  if (e.target === modal) {
+    fecharModal();
   }
 });
 
