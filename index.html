@@ -303,23 +303,30 @@ class Destaques{
 }
 
 // ==================== CARREGAR CSV ====================
-Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
-  const dados=res.data.slice(1).map(i=>{
-    i.ref=i.ref||""; 
-    i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não";
-    i.condominio=(i.cond_incluso&&["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase()))?"Sim":"Não";
-    i.garagem=i.garagem||"0"; i.titulo=i.titulo||""; i.descricao=i.descricao||"";
-    i.tipo=i.tipo||""; i.operacao=i.operacao||""; i.cidade=i.cidade||"";
-    i.preco=i.preco||"0"; i.area=i.area||"0"; i.banheiros=i.banheiros||"0"; i.quartos=i.quartos||"0";
-    i.imagens=i.imagens||""; return i;
-  });
-  const modal=new ModalImovel("detalhesModal");
-  const lista=new ListaImoveis("lista",modal);
-  new FiltroImoveis("filtros-container",dados,lista);
-  new TabsImoveis("tabs-container",dados,lista);
-  new OrdenacaoImoveis("ordenacao-container",lista);
-  new Destaques(dados);
-}});
+Papa.parse(csvUrl,{
+  download:true,
+  header:true,
+  complete: res => {
+    const allData = res.data.slice(1); // Pula a primeira linha
+    const dados = allData.map(i => {
+      i.ref=i.ref||""; 
+      i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não";
+      i.condominio=(i.cond_incluso&&["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase()))?"Sim":"Não";
+      i.garagem=i.garagem||"0"; i.titulo=i.titulo||""; i.descricao=i.descricao||"";
+      i.tipo=i.tipo||""; i.operacao=i.operacao||""; i.cidade=i.cidade||"";
+      i.preco=i.preco||"0"; i.area=i.area||"0"; i.banheiros=i.banheiros||"0"; i.quartos=i.quartos||"0";
+      i.imagens=i.imagens||"";
+      return i;
+    });
+
+    const modal = new ModalImovel("detalhesModal");
+    const lista = new ListaImoveis("lista", modal);
+    new FiltroImoveis("filtros-container", dados, lista);
+    new TabsImoveis("tabs-container", dados, lista);
+    new OrdenacaoImoveis("ordenacao-container", lista);
+    new Destaques(dados);
+  }
+});
 </script>
 
 </body>
