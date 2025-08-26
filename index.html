@@ -264,7 +264,6 @@ body {
 /* ==================== WHATSAPP FLUTUANTE ==================== */
 #whatsapp-flutuante {
     position: fixed;
-    bottom: 15px;
     right: 15px;
     width: 50px;
     height: 50px;
@@ -328,6 +327,52 @@ body {
 // ==================== CONFIG ====================
 const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv";
 const whatsappNumber = "5512992468636";
+
+/* ==================== BOTÃO WHATSAPP FLUTUANTE ==================== */
+const whatsapp = document.getElementById('whatsapp-flutuante');
+
+// Configuração: tempo em ms para voltar a seguir a rolagem
+const idleDelay = 3000; // 3 segundos
+
+let targetY = window.innerHeight - 80; 
+let currentY = targetY;
+let lastMove = Date.now();
+
+// Animação suave
+function animate() {
+  const now = Date.now();
+
+  // Se passou do tempo configurado sem mexer o mouse → segue rolagem
+  if (now - lastMove > idleDelay) {
+    targetY = window.scrollY + window.innerHeight - 80;
+  }
+
+  // suavização do movimento
+  currentY += (targetY - currentY) * 0.1;
+  whatsapp.style.top = currentY + "px";
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Segue o mouse no eixo Y
+document.addEventListener('mousemove', e => {
+  targetY = e.clientY - 25;
+  lastMove = Date.now();
+
+  // Mantém sempre dentro da viewport
+  if (targetY < 15) targetY = 15;
+  if (targetY > window.scrollY + window.innerHeight - 65) {
+    targetY = window.scrollY + window.innerHeight - 65;
+  }
+});
+
+// Ajusta quando a tela é redimensionada
+window.addEventListener('resize', () => {
+  if (targetY > window.scrollY + window.innerHeight - 65) {
+    targetY = window.scrollY + window.innerHeight - 65;
+  }
+});
 
 // ==================== CLASSES ====================
 
