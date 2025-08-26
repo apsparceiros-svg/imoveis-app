@@ -40,42 +40,46 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 #destaques .destaque-card p{padding:8px;margin:0;font-size:14px;font-weight:bold;color:#2d89ef;text-align:center;}
 .destaque-left{left:0;position:absolute;z-index:10;}
 .destaque-right{right:0;position:absolute;z-index:10;}
-#whatsapp-flutuante{position:fixed;right:20px;top:50%;transform:translateY(-50%);background:#25D366;color:#fff;padding:12px 16px;border-radius:50px;text-decoration:none;font-weight:bold;z-index:9999;cursor:pointer;transition:top 0.2s ease;}
+#whatsapp-flutuante{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: url('https://cdn-icons-png.flaticon.com/512/733/733585.png') no-repeat center center;
+  background-size: cover;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 9999;
+}
 @media(max-width:768px){#lista{grid-template-columns:1fr;} .card img{height:150px;} .tab{overflow-x:auto; white-space:nowrap;}}
 </style>
 </head>
 <body>
 
-
 <div id="destaques-container">
-<span class="nav-arrow destaque-left">&#10094;</span>
-<div id="destaques"></div>
-<span class="nav-arrow destaque-right">&#10095;</span>
+  <span class="nav-arrow destaque-left">&#10094;</span>
+  <div id="destaques"></div>
+  <span class="nav-arrow destaque-right">&#10095;</span>
 </div>
-
 
 <div id="imoveis-app">
-<div id="tabs-container"></div>
-<div id="filtros-container"></div>
-<div id="ordenacao-container"></div>
-<div id="lista"></div>
-<div id="detalhesModal" class="modal">
-<div class="modal-content">
-<span class="close">&times;</span>
-<div id="modal-body"></div>
-</div>
-</div>
+  <div id="tabs-container"></div>
+  <div id="filtros-container"></div>
+  <div id="ordenacao-container"></div>
+  <div id="lista"></div>
+  <div id="detalhesModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modal-body"></div>
+    </div>
+  </div>
 </div>
 
-
-<a id="whatsapp-flutuante" href="https://api.whatsapp.com/send?phone=5512992468636" target="_blank">WhatsApp</a>
-
+<a id="whatsapp-flutuante" href="https://api.whatsapp.com/send?phone=5512992468636" target="_blank"></a>
 
 <script>
-const btnWhats=document.getElementById("whatsapp-flutuante");
-document.addEventListener('mousemove', e=>{let y=e.clientY;let offset=20;let maxY=window.innerHeight-btnWhats.offsetHeight-offset;let minY=offset;let top=Math.max(minY, Math.min(maxY, y-btnWhats.offsetHeight/2)); btnWhats.style.top=top+'px';});
-document.addEventListener('touchmove', e=>{if(e.touches.length>0){let y=e.touches[0].clientY;let offset=20;let maxY=window.innerHeight-btnWhats.offsetHeight-offset;let minY=offset;let top=Math.max(minY, Math.min(maxY, y-btnWhats.offsetHeight/2)); btnWhats.style.top=top+'px';}});
-
 
 // ==================== Modal ====================
 class ModalImovel{
@@ -240,7 +244,10 @@ Papa.parse(csvUrl, {
   header: true,
   skipEmptyLines: true,
   complete: res => {
-    const dados = res.data.map(i=>{
+    // Remove a primeira linha (cabeçalho) se houver
+    const dadosRaw = res.data.slice(1);
+
+    const dados = dadosRaw.map(i=>{
       i.ref = i.ref || "";
       i.pet = (i.pet && ["sim","s","1"].includes(i.pet.trim().toLowerCase())) ? "Sim" : "Não";
       i.condominio = (i.cond_incluso && ["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase())) ? "Sim" : "Não";
