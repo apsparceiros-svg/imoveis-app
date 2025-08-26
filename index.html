@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>App de Imóveis - Mobile</title>
+<title>App de Imóveis - Mobile & Desktop</title>
 <style>
 /* ==================== RESET & GERAL ==================== */
 body {
@@ -206,8 +206,6 @@ body {
 
 /* ==================== CARROSSEL ==================== */
 #destaques-container {
-    display: flex;
-    align-items: center;
     position: relative;
     margin-top: 15px;
 }
@@ -216,8 +214,7 @@ body {
     gap: 12px;
     overflow-x: auto;
     scroll-behavior: smooth;
-    flex: 1;
-    padding: 0 15px;
+    padding: 0 40px; /* espaço para setas */
 }
 #destaques .destaque-card {
     min-width: 160px;
@@ -245,6 +242,21 @@ body {
     font-weight: bold;
     color: #2d89ef;
     text-align: center;
+}
+
+/* Setas fora do carrossel */
+#destaques-container .destaque-left,
+#destaques-container .destaque-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    color: #fff;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
 }
 #destaques-container .destaque-left { left: 5px; }
 #destaques-container .destaque-right { right: 5px; }
