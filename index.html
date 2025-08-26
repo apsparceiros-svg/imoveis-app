@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>App de Imóveis Completo</title>
+<title>App de Imóveis Responsivo</title>
 <style>
 body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 #lista{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:30px;padding:0 10px;}
-.card{border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.1);transition:0.2s;display:flex;flex-direction:column;cursor:pointer;}
+.card{border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.1);transition:0.3s;display:flex;flex-direction:column;cursor:pointer;}
 .card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.2);}
-.card img, .destaque-card img, .miniaturas img {border-radius:12px; transition: transform 0.3s;}
+.card img, .destaque-card img, .miniaturas img {border-radius:12px; transition: transform 0.3s; width:100%; height:auto; object-fit:cover;}
 .card img:hover, .destaque-card img:hover {transform: scale(1.05);}
 .card-body{padding:12px;flex:1;display:flex;flex-direction:column;justify-content:space-between;}
 .card h3{margin:0;font-size:16px;color:#1a1a1a;}
@@ -32,31 +32,30 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 #whatsapp-flutuante img{width:100%;height:100%;border-radius:50%;}
 
 /* Destaques */
-#destaques-container{position:relative;margin:15px 0;overflow:hidden;height:140px;}
-#destaques{display:flex;gap:12px;transition:transform 0.2s linear;scroll-behavior:smooth;}
-.destaque-card{min-width:160px;flex:0 0 auto;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);cursor:pointer;transition:transform 0.3s;}
-.destaque-card p{padding:6px;margin:0;font-size:12px;font-weight:bold;color:#2d89ef;text-align:center;}
-.destaque-left,.destaque-right{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;color:#fff;background:rgba(0,0,0,0.4);padding:6px 12px;border-radius:50%;cursor:pointer;z-index:10;}
+#destaques-container{position:relative;margin:15px 0;overflow:hidden;height:130px;}
+#destaques{display:flex;gap:10px;transition:transform 0.2s linear;scroll-behavior:smooth;}
+.destaque-card{min-width:120px;flex:0 0 auto;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);cursor:pointer;transition:transform 0.3s;}
+.destaque-card p{padding:4px;margin:0;font-size:12px;font-weight:bold;color:#2d89ef;text-align:center;}
+.destaque-left,.destaque-right{position:absolute;top:50%;transform:translateY(-50%);font-size:24px;color:#fff;background:rgba(0,0,0,0.4);padding:4px 8px;border-radius:50%;cursor:pointer;z-index:10;}
 .destaque-left{left:5px;} .destaque-right{right:5px;}
 
 .miniaturas{display:flex;justify-content:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
 .miniaturas img{width:50px;height:50px;object-fit:cover;border-radius:12px;cursor:pointer;border:2px solid transparent;transition:border 0.2s;}
 .miniaturas img.selected{border-color:#2d89ef;}
 
-@media(min-width:600px){#lista{grid-template-columns:repeat(2,1fr);}}
-@media(min-width:900px){#lista{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){#lista{grid-template-columns:1fr;} .destaque-card{min-width:100px;}}
+@media(min-width:601px) and (max-width:900px){#lista{grid-template-columns:repeat(2,1fr);} .destaque-card{min-width:140px;}}
+@media(min-width:901px){#lista{grid-template-columns:repeat(3,1fr);} .destaque-card{min-width:160px;}}
 </style>
 </head>
 <body>
 
-<!-- Destaques no topo -->
 <div id="destaques-container">
   <span class="destaque-left">&#10094;</span>
   <div id="destaques"></div>
   <span class="destaque-right">&#10095;</span>
 </div>
 
-<!-- Filtros e lista -->
 <div id="imoveis-app">
   <div id="tabs-container"></div>
   <div id="filtros-container"></div>
@@ -126,100 +125,109 @@ class ModalImovel{
 
 // Carregar CSV e inicializar app
 const csvUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv";
-Papa.parse(csvUrl,{download:true,header:true,
-complete: res=>{
-const dados=res.data.filter(i=>i.titulo);
-const modal=new ModalImovel("detalhesModal");
+Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
+  const dados=res.data.slice(1).map(i=>{
+    i.ref=i.ref||""; i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não";
+    i.condominio=(i.cond_incluso&&["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase()))?"Sim":"Não";
+    i.garagem=i.garagem||"0"; i.titulo=i.titulo||""; i.descricao=i.descricao||"";
+    i.tipo=i.tipo||""; i.operacao=i.operacao||""; i.cidade=i.cidade||""; i.preco=i.preco||"0"; i.area=i.area||"0"; i.banheiros=i.banheiros||"0"; i.quartos=i.quartos||"0";
+    i.imagens=i.imagens||""; return i;
+  });
+  const modal=new ModalImovel("detalhesModal");
+  const lista=document.getElementById("lista");
 
-// Lista
-class ListaImoveis{
-constructor(id,modal){this.lista=document.getElementById(id);this.modal=modal;}
-render(d){this.lista.innerHTML="";d.forEach(i=>{
-const c=document.createElement("div");c.className="card";
-c.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/400x250'}"><div class="card-body"><h3>${i.titulo}</h3><p class="preco">R$ ${Number(i.preco).toLocaleString()}</p><p>${i.cidade} | ${i.tipo}</p><button class="btn-detalhes">Detalhes</button></div>`;
-c.querySelector(".btn-detalhes").onclick=()=>modal.abrir(i);
-this.lista.appendChild(c);
-});}
-}
-const lista=new ListaImoveis("lista",modal);
-lista.render(dados);
+  function renderLista(dadosFiltrados){
+    lista.innerHTML="";
+    dadosFiltrados.forEach(i=>{
+      const c=document.createElement("div"); c.className="card";
+      c.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/400x250'}"><div class="card-body"><h3>${i.titulo}</h3><p class="preco">R$ ${Number(i.preco).toLocaleString()}</p><p>${i.cidade} | ${i.tipo}</p><button class="btn-detalhes">Detalhes</button></div>`;
+      c.querySelector(".btn-detalhes").onclick=()=>modal.abrir(i);
+      lista.appendChild(c);
+    });
+  }
+  renderLista(dados);
 
-// Tabs
-const tabsContainer=document.getElementById("tabs-container");
-const ops=[...new Set(dados.map(i=>i.operacao))];
-ops.unshift("Todos");
-ops.forEach(op=>{
-const t=document.createElement("span");t.className="tab";t.textContent=op;t.dataset.tab=op;
-t.onclick=()=>{
-document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-t.classList.add("active");
-lista.render(op==="Todos"?dados:dados.filter(i=>i.operacao===op));
-};
-tabsContainer.appendChild(t);
-});
-tabsContainer.querySelector(".tab").classList.add("active");
+  // Tabs
+  const tabsContainer=document.getElementById("tabs-container");
+  const ops=[...new Set(dados.map(i=>i.operacao))];
+  ops.unshift("Todos");
+  ops.forEach(op=>{
+    const t=document.createElement("span");t.className="tab";t.textContent=op;t.dataset.tab=op;
+    t.onclick=()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      renderLista(op==="Todos"?dados:dados.filter(i=>i.operacao===op));
+    };
+    tabsContainer.appendChild(t);
+  });
+  tabsContainer.querySelector(".tab").classList.add("active");
 
-// Filtros
-const filtros=document.getElementById("filtros-container");
-const cidades=[...new Set(dados.map(i=>i.cidade))];
-const tipos=[...new Set(dados.map(i=>i.tipo))];
-filtros.innerHTML=`
-<input id="busca" placeholder="Tít., desc., bairro ou código">
-<select id="filtroCidade"><option value="">Cidades</option>${cidades.map(c=>`<option>${c}</option>`).join('')}</select>
-<select id="filtroTipo"><option value="">Tipos</option>${tipos.map(t=>`<option>${t}</option>`).join('')}</select>
-<select id="filtroPet"><option value="">Aceita Pet?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
-<select id="filtroCondo"><option value="">Condomínio incluso?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
-<input id="filtroPrecoMin" type="number" placeholder="Preço mínimo">
-<input id="filtroPrecoMax" type="number" placeholder="Preço máximo">
-`;
-const updateFilters=()=>{
-let f={
-busca:document.getElementById("busca").value,
-cidade:document.getElementById("filtroCidade").value,
-tipo:document.getElementById("filtroTipo").value,
-pet:document.getElementById("filtroPet").value,
-condominio:document.getElementById("filtroCondo").value,
-precoMin:document.getElementById("filtroPrecoMin").value,
-precoMax:document.getElementById("filtroPrecoMax").value
-};
-let dFiltrado=dados.filter(i=>{
-let p=Number(i.preco);
-if(f.busca && !(`${i.titulo} ${i.descricao} ${i.bairro} ${i.ref||''}`.toLowerCase().includes(f.busca.toLowerCase())))return false;
-if(f.cidade && i.cidade!==f.cidade)return false;
-if(f.tipo && i.tipo!==f.tipo)return false;
-if(f.pet && i.pet!==f.pet)return false;
-if(f.condominio && i.condominio!==f.condominio)return false;
-if(f.precoMin && p<Number(f.precoMin))return false;
-if(f.precoMax && p>Number(f.precoMax))return false;
-return true;
-});
-lista.render(dFiltrado);
-};
-["busca","filtroCidade","filtroTipo","filtroPet","filtroCondo","filtroPrecoMin","filtroPrecoMax"].forEach(id=>{
-const el=document.getElementById(id);
-el.addEventListener(el.tagName=="INPUT"?"input":"change",updateFilters);
-});
+  // Filtros
+  const filtros=document.getElementById("filtros-container");
+  const cidades=[...new Set(dados.map(i=>i.cidade))];
+  const tipos=[...new Set(dados.map(i=>i.tipo))];
+  filtros.innerHTML=`
+    <input id="busca" placeholder="Tít., desc., bairro ou código">
+    <select id="filtroCidade"><option value="">Cidades</option>${cidades.map(c=>`<option>${c}</option>`).join('')}</select>
+    <select id="filtroTipo"><option value="">Tipos</option>${tipos.map(t=>`<option>${t}</option>`).join('')}</select>
+    <select id="filtroPet"><option value="">Aceita Pet?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
+    <select id="filtroCondo"><option value="">Condomínio incluso?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
+    <input id="filtroPrecoMin" type="number" placeholder="Preço mínimo">
+    <input id="filtroPrecoMax" type="number" placeholder="Preço máximo">
+  `;
+  function atualizarFiltros(){
+    const f={
+      busca:document.getElementById("busca").value,
+      cidade:document.getElementById("filtroCidade").value,
+      tipo:document.getElementById("filtroTipo").value,
+      pet:document.getElementById("filtroPet").value,
+      condominio:document.getElementById("filtroCondo").value,
+      precoMin:document.getElementById("filtroPrecoMin").value,
+      precoMax:document.getElementById("filtroPrecoMax").value
+    };
+    const tabActive=document.querySelector(".tab.active")?.dataset.tab||"";
+    let dFiltrado=dados.filter(i=>{
+      let p=Number(i.preco);
+      if(tabActive && tabActive!=="Todos" && i.operacao!==tabActive) return false;
+      if(f.busca && !(`${i.titulo} ${i.descricao} ${i.bairro} ${i.ref||''}`.toLowerCase().includes(f.busca.toLowerCase())) ) return false;
+      if(f.cidade && i.cidade!==f.cidade) return false;
+      if(f.tipo && i.tipo!==f.tipo) return false;
+      if(f.pet && i.pet!==f.pet) return false;
+      if(f.condominio && i.condominio!==f.condominio) return false;
+      if(f.precoMin && p<Number(f.precoMin)) return false;
+      if(f.precoMax && p>Number(f.precoMax)) return false;
+      return true;
+    });
+    renderLista(dFiltrado);
+  }
+  ["busca","filtroCidade","filtroTipo","filtroPet","filtroCondo","filtroPrecoMin","filtroPrecoMax"].forEach(id=>{
+    const el=document.getElementById(id);
+    el.addEventListener(el.tagName==="INPUT"?"input":"change",atualizarFiltros);
+  });
 
-// Destaques
-const destaquesContainer=document.getElementById("destaques");
-const destaqueCards=dados.slice(0,10).map(i=>`<div class="destaque-card"><img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/200x120'}"><p>${i.titulo} - R$ ${Number(i.preco).toLocaleString()}</p></div>`).join('');
-destaquesContainer.innerHTML=destaqueCards;
-const cards=destaquesContainer.querySelectorAll(".destaque-card");
-cards.forEach((c,i)=>c.onclick=()=>modal.abrir(dados[i]));
-const cardWidth=cards[0]?.offsetWidth+12||172;
-document.querySelector(".destaque-left").onclick=()=>destaquesContainer.scrollBy({left:-cardWidth,behavior:"smooth"});
-document.querySelector(".destaque-right").onclick=()=>destaquesContainer.scrollBy({left:cardWidth,behavior:"smooth"});
+  // Destaques
+  const destaquesContainer=document.getElementById("destaques");
+  function renderDestaques(){
+    destaquesContainer.innerHTML=dados.slice(0,10).map(i=>`<div class="destaque-card"><img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/200x120'}"><p>${i.titulo} - R$ ${Number(i.preco).toLocaleString()}</p></div>`).join('');
+    const cards=destaquesContainer.querySelectorAll(".destaque-card");
+    cards.forEach((c,i)=>c.onclick=()=>modal.abrir(dados[i]));
+  }
+  renderDestaques();
 
-// Swipe mobile
-let startX=0,isDragging=false;
-destaquesContainer.addEventListener("touchstart",e=>{startX=e.touches[0].clientX;isDragging=true;});
-destaquesContainer.addEventListener("touchmove",e=>{
-if(!isDragging)return;
-let diff=startX-e.touches[0].clientX;
-if(Math.abs(diff)>30){destaquesContainer.scrollBy({left:diff>0?cardWidth:-cardWidth,behavior:"smooth"});startX=e.touches[0].clientX;}
-});
-destaquesContainer.addEventListener("touchend",()=>{isDragging=false;});
+  // Seta
+  const cardWidth=destaquesContainer.querySelector(".destaque-card")?.offsetWidth+10||130;
+  document.querySelector(".destaque-left").onclick=()=>destaquesContainer.scrollBy({left:-cardWidth,behavior:"smooth"});
+  document.querySelector(".destaque-right").onclick=()=>destaquesContainer.scrollBy({left:cardWidth,behavior:"smooth"});
 
+  // Swipe mobile
+  let startX=0,isDragging=false;
+  destaquesContainer.addEventListener("touchstart",e=>{startX=e.touches[0].clientX;isDragging=true;});
+  destaquesContainer.addEventListener("touchmove",e=>{
+    if(!isDragging)return;
+    let diff=startX-e.touches[0].clientX;
+    if(Math.abs(diff)>30){destaquesContainer.scrollBy({left:diff>0?cardWidth:-cardWidth,behavior:"smooth"});startX=e.touches[0].clientX;}
+  });
+  destaquesContainer.addEventListener("touchend",()=>{isDragging=false;});
 }});
 </script>
 </body>
