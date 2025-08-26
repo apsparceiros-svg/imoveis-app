@@ -14,7 +14,7 @@ body {
 }
 #imoveis-app input, #imoveis-app select {
     padding: 8px 10px;
-    margin: 5px 5px 15px 0;
+    margin: 5px 0 15px 0;
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 14px;
@@ -107,7 +107,6 @@ body {
     max-width: 400px;
     max-height: 90vh;
     overflow-y: auto;
-    overflow-x: hidden;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -135,17 +134,18 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 24px;
+    font-size: 22px;
     color: #fff;
     background: rgba(0,0,0,0.3);
-    padding: 5px 10px;
+    padding: 4px 8px;
     border-radius: 50%;
     cursor: pointer;
     user-select: none;
     z-index: 5;
 }
-.modal-content .nav-left { left: -5px; } 
-.modal-content .nav-right { right: -5px; }
+.modal-content .nav-left { left: 8px; } 
+.modal-content .nav-right { right: 8px; }
+
 .miniaturas {
     display: flex;
     justify-content: center;
@@ -161,11 +161,9 @@ body {
     cursor: pointer;
     border: 2px solid transparent;
     transition: border 0.2s;
-    max-width: 100%;
 }
-.miniaturas img.selected {
-    border-color: #2d89ef;
-}
+.miniaturas img.selected { border-color: #2d89ef; }
+
 .close {
     color: #aaa;
     position: absolute;
@@ -179,16 +177,8 @@ body {
 
 /* ==================== TABS & FILTROS ==================== */
 .nav-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 28px;
-    color: #fff;
-    background: rgba(0,0,0,0.4);
-    padding: 6px 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    user-select: none;
+    font-size: 24px;
+    background: rgba(0,0,0,0.3);
 }
 .tab {
     display: inline-block;
@@ -209,7 +199,7 @@ body {
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 14px;
-    margin-right: 5px;
+    margin-bottom: 10px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -227,7 +217,7 @@ body {
     overflow-x: auto;
     scroll-behavior: smooth;
     flex: 1;
-    padding: 0 10px;
+    padding: 0 15px;
 }
 #destaques .destaque-card {
     min-width: 160px;
@@ -256,10 +246,8 @@ body {
     color: #2d89ef;
     text-align: center;
 }
-#destaques-container .nav-arrow {
-    font-size: 24px;
-    background: rgba(0,0,0,0.3);
-}
+#destaques-container .destaque-left { left: 5px; }
+#destaques-container .destaque-right { right: 5px; }
 
 /* ==================== WHATSAPP FLUTUANTE ==================== */
 #whatsapp-flutuante {
@@ -281,6 +269,15 @@ body {
 }
 @media (min-width: 900px) {
     #lista { grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 0 30px; }
+}
+@media (max-width: 480px) {
+    #destaques-container .nav-arrow,
+    .modal-content .nav-arrow {
+        font-size: 20px;
+        padding: 3px 6px;
+    }
+    .card h3 { font-size: 14px; }
+    .card p, .card p.preco { font-size: 12px; }
 }
 </style>
 </head>
@@ -482,34 +479,51 @@ class OrdenacaoImoveis{
   }
 }
 
-// Destaques
-class Destaques{
-  constructor(imoveis){
-    this.i=imoveis; this.renderDestaques();
-  }
-  renderDestaques(){
-    const container=document.getElementById("destaques");
-    if(!container) return;
-    const cardsHTML=this.i.slice(0,10).map(imovel=>`
-      <div class="destaque-card">
-        <img src="${imovel.imagens.split(" ")[0]||'https://via.placeholder.com/200x120'}">
-        <p>${imovel.titulo} - R$ ${Number(imovel.preco).toLocaleString()}</p>
-      </div>`).join('');
-    container.innerHTML=cardsHTML+cardsHTML;
-    const allCards=container.querySelectorAll(".destaque-card");
-    const modal=new ModalImovel("detalhesModal");
-    allCards.forEach((card,idx)=>{ card.onclick=()=>modal.abrir(this.i[idx%10]); });
-    const cardWidth=container.querySelector(".destaque-card")?.offsetWidth+16||216;
-    const left=document.querySelector(".destaque-left");
-    const right=document.querySelector(".destaque-right");
-    const scrollByCard=(amount)=>{ container.scrollBy({left:amount,behavior:'smooth'}); setTimeout(()=>{if(container.scrollLeft>=container.scrollWidth/2) container.scrollLeft-=container.scrollWidth/2;if(container.scrollLeft<=0) container.scrollLeft+=container.scrollWidth/2;},300)};
-    if(left) left.onclick=()=>scrollByCard(-cardWidth);
-    if(right) right.onclick=()=>scrollByCard(cardWidth);
-    setInterval(()=>scrollByCard(cardWidth),4000);
-    let startX=0;
-    container.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
-    container.addEventListener("touchmove",e=>{ const diff=startX-e.touches[0].clientX;if(Math.abs(diff)>30){ scrollByCard(diff>0?cardWidth:-cardWidth); startX=e.touches[0].clientX;}});
-  }
+// ==================== CARROSSEL COM SWIPE ====================
+class Destaques {
+    constructor(imoveis) {
+        this.i = imoveis;
+        this.renderDestaques();
+    }
+    renderDestaques() {
+        const container = document.getElementById("destaques");
+        if (!container) return;
+        const cardsHTML = this.i.slice(0, 10).map(imovel => `
+            <div class="destaque-card">
+                <img src="${imovel.imagens.split(" ")[0] || 'https://via.placeholder.com/200x120'}">
+                <p>${imovel.titulo} - R$ ${Number(imovel.preco).toLocaleString()}</p>
+            </div>
+        `).join('');
+        container.innerHTML = cardsHTML + cardsHTML;
+        const allCards = container.querySelectorAll(".destaque-card");
+        const modal = new ModalImovel("detalhesModal");
+        allCards.forEach((card, idx) => card.onclick = () => modal.abrir(this.i[idx % 10]));
+
+        const cardWidth = container.querySelector(".destaque-card")?.offsetWidth + 12 || 172;
+        const left = document.querySelector(".destaque-left");
+        const right = document.querySelector(".destaque-right");
+        const scrollByCard = (amount) => {
+            container.scrollBy({ left: amount, behavior: 'smooth' });
+            setTimeout(() => {
+                if (container.scrollLeft >= container.scrollWidth / 2) container.scrollLeft -= container.scrollWidth / 2;
+                if (container.scrollLeft <= 0) container.scrollLeft += container.scrollWidth / 2;
+            }, 300);
+        };
+        if (left) left.onclick = () => scrollByCard(-cardWidth);
+        if (right) right.onclick = () => scrollByCard(cardWidth);
+        setInterval(() => scrollByCard(cardWidth), 4000);
+
+        // SWIPE
+        let startX = 0;
+        let isDragging = false;
+        container.addEventListener("touchstart", e => { startX = e.touches[0].clientX; isDragging = true; });
+        container.addEventListener("touchmove", e => {
+            if (!isDragging) return;
+            const diff = startX - e.touches[0].clientX;
+            if (Math.abs(diff) > 30) { scrollByCard(diff > 0 ? cardWidth : -cardWidth); startX = e.touches[0].clientX; }
+        });
+        container.addEventListener("touchend", () => { isDragging = false; });
+    }
 }
 
 // ==================== CARREGAR CSV ====================
@@ -517,7 +531,7 @@ Papa.parse(csvUrl,{
   download:true,
   header:true,
   complete: res => {
-    const allData = res.data.slice(1); // Pula a primeira linha
+    const allData = res.data.slice(1);
     const dados = allData.map(i => {
       i.ref=i.ref||""; 
       i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não";
@@ -528,7 +542,6 @@ Papa.parse(csvUrl,{
       i.imagens=i.imagens||"";
       return i;
     });
-
     const modal = new ModalImovel("detalhesModal");
     const lista = new ListaImoveis("lista", modal);
     new FiltroImoveis("filtros-container", dados, lista);
