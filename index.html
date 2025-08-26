@@ -33,7 +33,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 
 /* Destaques */
 #destaques-container{position:relative;margin:15px 0;overflow:hidden;height:140px;}
-#destaques{display:flex;gap:12px;transition:transform 0.2s linear;}
+#destaques{display:flex;gap:12px;transition:transform 0.2s linear;scroll-behavior:smooth;}
 .destaque-card{min-width:160px;flex:0 0 auto;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);cursor:pointer;transition:transform 0.3s;}
 .destaque-card p{padding:6px;margin:0;font-size:12px;font-weight:bold;color:#2d89ef;text-align:center;}
 .destaque-left,.destaque-right{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;color:#fff;background:rgba(0,0,0,0.4);padding:6px 12px;border-radius:50%;cursor:pointer;z-index:10;}
@@ -77,7 +77,6 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
-// WhatsApp flutuante
 const whatsapp=document.getElementById('whatsapp-flutuante');
 let targetY=window.innerHeight-80,currentY=targetY;
 function animateWA(){currentY+=(targetY-currentY)*0.1;whatsapp.style.top=currentY+"px";requestAnimationFrame(animateWA);}
@@ -142,21 +141,23 @@ c.querySelector(".btn-detalhes").onclick=()=>modal.abrir(i);
 this.lista.appendChild(c);
 });}
 }
-const listaImoveis=new ListaImoveis("lista",modal);
-listaImoveis.render(dados);
+const lista=new ListaImoveis("lista",modal);
+lista.render(dados);
 
 // Tabs
-const tabs=document.getElementById("tabs-container");
-const ops=[...new Set(dados.map(i=>i.operacao))]; ops.unshift("Todos");
+const tabsContainer=document.getElementById("tabs-container");
+const ops=[...new Set(dados.map(i=>i.operacao))];
+ops.unshift("Todos");
 ops.forEach(op=>{
-const t=document.createElement("span"); t.className="tab"; t.textContent=op;
+const t=document.createElement("span");t.className="tab";t.textContent=op;t.dataset.tab=op;
 t.onclick=()=>{
 document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
 t.classList.add("active");
-listaImoveis.render(op==="Todos"?dados:dados.filter(i=>i.operacao===op));
+lista.render(op==="Todos"?dados:dados.filter(i=>i.operacao===op));
 };
-tabs.appendChild(t);
-}); tabs.querySelector(".tab").classList.add("active");
+tabsContainer.appendChild(t);
+});
+tabsContainer.querySelector(".tab").classList.add("active");
 
 // Filtros
 const filtros=document.getElementById("filtros-container");
@@ -172,25 +173,27 @@ filtros.innerHTML=`
 <input id="filtroPrecoMax" type="number" placeholder="Preço máximo">
 `;
 const updateFilters=()=>{
-let f={busca:document.getElementById("busca").value,
+let f={
+busca:document.getElementById("busca").value,
 cidade:document.getElementById("filtroCidade").value,
 tipo:document.getElementById("filtroTipo").value,
 pet:document.getElementById("filtroPet").value,
 condominio:document.getElementById("filtroCondo").value,
 precoMin:document.getElementById("filtroPrecoMin").value,
-precoMax:document.getElementById("filtroPrecoMax").value};
+precoMax:document.getElementById("filtroPrecoMax").value
+};
 let dFiltrado=dados.filter(i=>{
 let p=Number(i.preco);
 if(f.busca && !(`${i.titulo} ${i.descricao} ${i.bairro} ${i.ref||''}`.toLowerCase().includes(f.busca.toLowerCase())))return false;
-if(f.cidade && i.cidade!==f.cidade) return false;
-if(f.tipo && i.tipo!==f.tipo) return false;
-if(f.pet && i.pet!==f.pet) return false;
-if(f.condominio && i.condominio!==f.condominio) return false;
-if(f.precoMin && p<Number(f.precoMin)) return false;
-if(f.precoMax && p>Number(f.precoMax)) return false;
+if(f.cidade && i.cidade!==f.cidade)return false;
+if(f.tipo && i.tipo!==f.tipo)return false;
+if(f.pet && i.pet!==f.pet)return false;
+if(f.condominio && i.condominio!==f.condominio)return false;
+if(f.precoMin && p<Number(f.precoMin))return false;
+if(f.precoMax && p>Number(f.precoMax))return false;
 return true;
 });
-listaImoveis.render(dFiltrado);
+lista.render(dFiltrado);
 };
 ["busca","filtroCidade","filtroTipo","filtroPet","filtroCondo","filtroPrecoMin","filtroPrecoMax"].forEach(id=>{
 const el=document.getElementById(id);
@@ -199,24 +202,25 @@ el.addEventListener(el.tagName=="INPUT"?"input":"change",updateFilters);
 
 // Destaques
 const destaquesContainer=document.getElementById("destaques");
-destaquesContainer.innerHTML=dados.slice(0,10).map(i=>`<div class="destaque-card"><img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/200x120'}"><p>${i.titulo} - R$ ${Number(i.preco).toLocaleString()}</p></div>`).join('');
+const destaqueCards=dados.slice(0,10).map(i=>`<div class="destaque-card"><img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/200x120'}"><p>${i.titulo} - R$ ${Number(i.preco).toLocaleString()}</p></div>`).join('');
+destaquesContainer.innerHTML=destaqueCards;
 const cards=destaquesContainer.querySelectorAll(".destaque-card");
-const left=document.querySelector(".destaque-left");
-const right=document.querySelector(".destaque-right");
+cards.forEach((c,i)=>c.onclick=()=>modal.abrir(dados[i]));
 const cardWidth=cards[0]?.offsetWidth+12||172;
-left.onclick=()=>destaquesContainer.scrollBy({left:-cardWidth,behavior:"smooth"});
-right.onclick=()=>destaquesContainer.scrollBy({left:cardWidth,behavior:"smooth"});
+document.querySelector(".destaque-left").onclick=()=>destaquesContainer.scrollBy({left:-cardWidth,behavior:"smooth"});
+document.querySelector(".destaque-right").onclick=()=>destaquesContainer.scrollBy({left:cardWidth,behavior:"smooth"});
+
+// Swipe mobile
 let startX=0,isDragging=false;
 destaquesContainer.addEventListener("touchstart",e=>{startX=e.touches[0].clientX;isDragging=true;});
 destaquesContainer.addEventListener("touchmove",e=>{
-if(!isDragging) return;
-const diff=startX - e.touches[0].clientX;
-if(Math.abs(diff)>30){destaquesContainer.scrollBy({left: diff>0? cardWidth:-cardWidth, behavior:"smooth"}); startX=e.touches[0].clientX;}
+if(!isDragging)return;
+let diff=startX-e.touches[0].clientX;
+if(Math.abs(diff)>30){destaquesContainer.scrollBy({left:diff>0?cardWidth:-cardWidth,behavior:"smooth"});startX=e.touches[0].clientX;}
 });
 destaquesContainer.addEventListener("touchend",()=>{isDragging=false;});
 
 }});
-
 </script>
 </body>
 </html>
