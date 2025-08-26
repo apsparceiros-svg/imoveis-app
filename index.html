@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>App de Imóveis - Completo</title>
+<title>App de Imóveis Completo</title>
 <style>
 body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 #lista{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:30px;padding:0 10px;}
@@ -29,6 +29,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 #whatsapp-flutuante{position:fixed;right:15px;width:50px;height:50px;z-index:9998;cursor:pointer;transition: transform 0.2s;}
 #whatsapp-flutuante img{width:100%;height:100%;border-radius:50%;}
 
+/* Destaques */
 #destaques-container{position:relative;margin:15px 0;overflow:hidden;height:140px;}
 #destaques{display:flex;gap:12px;transition:transform 0.2s linear;}
 .destaque-card{min-width:160px;flex:0 0 auto;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);cursor:pointer;}
@@ -47,7 +48,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 </head>
 <body>
 
-<!-- Carrossel no topo -->
+<!-- Destaques no topo -->
 <div id="destaques-container">
   <span class="destaque-left">&#10094;</span>
   <div id="destaques"></div>
@@ -75,13 +76,19 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
+// WhatsApp flutuante
 const whatsapp=document.getElementById('whatsapp-flutuante');
 let targetY=window.innerHeight-80, currentY=targetY;
 function animateWA(){currentY+=(targetY-currentY)*0.1;whatsapp.style.top=currentY+"px";requestAnimationFrame(animateWA);}
 animateWA();
-document.addEventListener('mousemove', e=>{targetY=e.clientY-25;if(targetY<15)targetY=15;if(targetY>window.scrollY+window.innerHeight-65)targetY=window.scrollY+window.innerHeight-65;});
+document.addEventListener('mousemove', e=>{
+  targetY=e.clientY-25;
+  if(targetY<15) targetY=15;
+  if(targetY>window.scrollY+window.innerHeight-65) targetY=window.scrollY+window.innerHeight-65;
+});
 window.addEventListener('scroll', ()=>{targetY=Math.min(targetY, window.scrollY+window.innerHeight-65);});
 
+// Modal
 class ModalImovel{
   constructor(id){
     this.modal=document.getElementById(id);
@@ -109,9 +116,17 @@ class ModalImovel{
     whatsapp.style.display="none";
     const main=this.body.querySelector("#main-img");
     const mini=this.body.querySelectorAll(".miniaturas img");
+    const left=this.body.querySelector(".nav-left");
+    const right=this.body.querySelector(".nav-right");
     let idx=0;
-    const update=i=>{ main.src=imgs[i]; mini.forEach((m,j)=>m.classList.toggle("selected",i===j)); idx=i; };
+    const update=i=>{
+      idx=i;
+      main.src=imgs[i];
+      mini.forEach((m,j)=>m.classList.toggle("selected",i===j));
+    };
     mini.forEach((m,i)=>m.onclick=()=>update(i));
+    left.onclick=()=>update((idx-1+imgs.length)%imgs.length);
+    right.onclick=()=>update((idx+1)%imgs.length);
     this.modal.style.display="block";
   }
   fechar(){this.modal.style.display="none";whatsapp.style.display="block";}
@@ -124,24 +139,34 @@ complete: res=>{
   const dados=res.data.filter(i=>i.titulo);
   const modal=new ModalImovel("detalhesModal");
 
+  // Lista
   class ListaImoveis{
     constructor(id,modal){this.lista=document.getElementById(id);this.modal=modal;}
-    render(d){this.lista.innerHTML="";d.forEach(i=>{const c=document.createElement("div");c.className="card";
+    render(d){this.lista.innerHTML="";d.forEach(i=>{
+      const c=document.createElement("div");c.className="card";
       c.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/400x250'}"><div class="card-body"><h3>${i.titulo}</h3><p class="preco">R$ ${Number(i.preco).toLocaleString()}</p><p>${i.cidade} | ${i.tipo}</p><button class="btn-detalhes">Detalhes</button></div>`;
       c.querySelector(".btn-detalhes").onclick=()=>modal.abrir(i);
-      this.lista.appendChild(c);});}}
+      this.lista.appendChild(c);
+    });}
+  }
   const listaImoveis=new ListaImoveis("lista",modal);
   listaImoveis.render(dados);
 
   // Tabs
   const tabs=document.getElementById("tabs-container");
   const ops=[...new Set(dados.map(i=>i.operacao))]; ops.unshift("Todos");
-  ops.forEach(op=>{const t=document.createElement("span"); t.className="tab"; t.textContent=op;
-    t.onclick=()=>{tabs.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); t.classList.add("active"); listaImoveis.render(op=="Todos"?dados:dados.filter(i=>i.operacao==op));};
-    tabs.appendChild(t);});
+  ops.forEach(op=>{
+    const t=document.createElement("span"); t.className="tab"; t.textContent=op;
+    t.onclick=()=>{
+      tabs.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      listaImoveis.render(op=="Todos"?dados:dados.filter(i=>i.operacao==op));
+    };
+    tabs.appendChild(t);
+  });
   tabs.querySelector(".tab").classList.add("active");
 
-  // Filtros avançados
+  // Filtros
   const filtros=document.getElementById("filtros-container");
   const cidades=[...new Set(dados.map(i=>i.cidade))];
   const tipos=[...new Set(dados.map(i=>i.tipo))];
@@ -180,14 +205,26 @@ complete: res=>{
   });
   updateFilters();
 
-  // Destaques
+  // Destaques com setas e swipe
   const destaquesContainer=document.getElementById("destaques");
+  const containerWrapper=document.getElementById("destaques-container");
   dados.slice(0,10).forEach(i=>{
     const d=document.createElement("div"); d.className="destaque-card";
     d.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/160x100'}"><p>${i.titulo} - R$ ${Number(i.preco).toLocaleString()}</p>`;
     d.onclick=()=>modal.abrir(i);
     destaquesContainer.appendChild(d);
   });
+  const cardWidth=destaquesContainer.querySelector(".destaque-card")?.offsetWidth+12||172;
+  document.querySelector(".destaque-left").onclick=()=>{destaquesContainer.scrollBy({left:-cardWidth, behavior:"smooth"});};
+  document.querySelector(".destaque-right").onclick=()=>{destaquesContainer.scrollBy({left:cardWidth, behavior:"smooth"});};
+  let startX=0,isDragging=false;
+  destaquesContainer.addEventListener("touchstart",e=>{startX=e.touches[0].clientX; isDragging=true;});
+  destaquesContainer.addEventListener("touchmove",e=>{
+    if(!isDragging) return;
+    const diff=startX-e.touches[0].clientX;
+    if(Math.abs(diff)>30){destaquesContainer.scrollBy({left: diff>0? cardWidth:-cardWidth, behavior:"smooth"}); startX=e.touches[0].clientX;}
+  });
+  destaquesContainer.addEventListener("touchend",()=>{isDragging=false;});
 }});
 </script>
 </body>
