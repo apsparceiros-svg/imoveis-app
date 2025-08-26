@@ -9,8 +9,8 @@ body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;margin:0;padding:0;}
 #lista{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:30px;padding:0 10px;}
 .card{border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.1);transition:0.3s;display:flex;flex-direction:column;cursor:pointer;}
 .card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.2);}
-.card img, .destaque-card img, .miniaturas img {border-radius:12px; transition: transform 0.3s; width:100%; height:auto; object-fit:cover;}
-.card img:hover, .destaque-card img:hover {transform: scale(1.05);}
+.card img,.destaque-card img,.miniaturas img{border-radius:12px;transition: transform 0.3s;width:100%;height:auto;object-fit:cover;}
+.card img:hover,.destaque-card img:hover{transform: scale(1.05);}
 .card-body{padding:12px;flex:1;display:flex;flex-direction:column;justify-content:space-between;}
 .card h3{margin:0;font-size:16px;color:#1a1a1a;}
 .card p{margin:4px 0;color:#555;font-size:13px;}
@@ -100,7 +100,7 @@ class ModalImovel{
       <p><b>Preço:</b> R$ ${Number(imovel.preco).toLocaleString()} | <b>Cidade:</b> ${imovel.cidade} | <b>Bairro:</b> ${imovel.bairro} | <b>Tipo:</b> ${imovel.tipo} | <b>Operação:</b> ${imovel.operacao}</p>
       <p><b>Área:</b> ${imovel.area}m² | <b>Quartos:</b> ${imovel.quartos} | <b>Banheiros:</b> ${imovel.banheiros} | <b>Garagem:</b> ${imovel.garagem} | <b>Condomínio:</b> ${imovel.condominio} | <b>Pet:</b> ${imovel.pet}</p>
       <p>${imovel.descricao}</p>
-      <div style="position:relative;overflow:hidden;">
+      <div style="position:relative; overflow:hidden;">
         <img id="main-img" src="${imgs[0]||'https://via.placeholder.com/400x250'}">
         <span class="nav-arrow nav-left">&#10094;</span>
         <span class="nav-arrow nav-right">&#10095;</span>
@@ -108,31 +108,20 @@ class ModalImovel{
       <div class="miniaturas">${imgs.map((s,i)=>`<img src="${s}" class="${i===0?'selected':''}">`).join('')}</div>
       <a class="btn-whatsapp" href="https://api.whatsapp.com/send?phone=5512992468636&text=Olá,%20interessei-me%20no%20imóvel%20${imovel.titulo}" target="_blank">WhatsApp</a>
     `;
-    whatsapp.style.display="none";
+    whatsapp.style.display='none';
     const main=this.body.querySelector("#main-img");
     const mini=this.body.querySelectorAll(".miniaturas img");
-    const left=this.body.querySelector(".nav-left");
-    const right=this.body.querySelector(".nav-right");
     let idx=0;
-    const update=i=>{idx=i;main.src=imgs[i];mini.forEach((m,j)=>m.classList.toggle("selected",i===j));};
+    const update=i=>{main.src=imgs[i];mini.forEach((m,j)=>m.classList.toggle("selected",i===j)); idx=i;};
     mini.forEach((m,i)=>m.onclick=()=>update(i));
-    left.onclick=()=>update((idx-1+imgs.length)%imgs.length);
-    right.onclick=()=>update((idx+1)%imgs.length);
     this.modal.style.display="block";
   }
-  fechar(){this.modal.style.display="none";whatsapp.style.display="block";}
+  fechar(){this.modal.style.display="none";whatsapp.style.display='block';}
 }
 
-// Carregar CSV e inicializar app
-const csvUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv";
-Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
-  const dados=res.data.slice(1).map(i=>{
-    i.ref=i.ref||""; i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não";
-    i.condominio=(i.cond_incluso&&["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase()))?"Sim":"Não";
-    i.garagem=i.garagem||"0"; i.titulo=i.titulo||""; i.descricao=i.descricao||"";
-    i.tipo=i.tipo||""; i.operacao=i.operacao||""; i.cidade=i.cidade||""; i.preco=i.preco||"0"; i.area=i.area||"0"; i.banheiros=i.banheiros||"0"; i.quartos=i.quartos||"0";
-    i.imagens=i.imagens||""; return i;
-  });
+// Carregar CSV
+Papa.parse("https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv",{download:true,header:true,complete:res=>{
+  const dados=res.data.slice(1).map(i=>{i.ref=i.ref||""; i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não"; i.condominio=(i.cond_incluso&&["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase()))?"Sim":"Não"; i.garagem=i.garagem||"0"; i.titulo=i.titulo||""; i.descricao=i.descricao||""; i.tipo=i.tipo||""; i.operacao=i.operacao||""; i.cidade=i.cidade||""; i.preco=i.preco||"0"; i.area=i.area||"0"; i.banheiros=i.banheiros||"0"; i.quartos=i.quartos||"0"; i.imagens=i.imagens||""; return i;});
   const modal=new ModalImovel("detalhesModal");
   const lista=document.getElementById("lista");
 
@@ -148,7 +137,7 @@ Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
   renderLista(dados);
 
   // Tabs
-  const tabsContainer=document.getElementById("tabs-container");
+  const tabs=document.getElementById("tabs-container");
   const ops=[...new Set(dados.map(i=>i.operacao))];
   ops.unshift("Todos");
   ops.forEach(op=>{
@@ -158,52 +147,9 @@ Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
       t.classList.add("active");
       renderLista(op==="Todos"?dados:dados.filter(i=>i.operacao===op));
     };
-    tabsContainer.appendChild(t);
+    tabs.appendChild(t);
   });
-  tabsContainer.querySelector(".tab").classList.add("active");
-
-  // Filtros
-  const filtros=document.getElementById("filtros-container");
-  const cidades=[...new Set(dados.map(i=>i.cidade))];
-  const tipos=[...new Set(dados.map(i=>i.tipo))];
-  filtros.innerHTML=`
-    <input id="busca" placeholder="Tít., desc., bairro ou código">
-    <select id="filtroCidade"><option value="">Cidades</option>${cidades.map(c=>`<option>${c}</option>`).join('')}</select>
-    <select id="filtroTipo"><option value="">Tipos</option>${tipos.map(t=>`<option>${t}</option>`).join('')}</select>
-    <select id="filtroPet"><option value="">Aceita Pet?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
-    <select id="filtroCondo"><option value="">Condomínio incluso?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
-    <input id="filtroPrecoMin" type="number" placeholder="Preço mínimo">
-    <input id="filtroPrecoMax" type="number" placeholder="Preço máximo">
-  `;
-  function atualizarFiltros(){
-    const f={
-      busca:document.getElementById("busca").value,
-      cidade:document.getElementById("filtroCidade").value,
-      tipo:document.getElementById("filtroTipo").value,
-      pet:document.getElementById("filtroPet").value,
-      condominio:document.getElementById("filtroCondo").value,
-      precoMin:document.getElementById("filtroPrecoMin").value,
-      precoMax:document.getElementById("filtroPrecoMax").value
-    };
-    const tabActive=document.querySelector(".tab.active")?.dataset.tab||"";
-    let dFiltrado=dados.filter(i=>{
-      let p=Number(i.preco);
-      if(tabActive && tabActive!=="Todos" && i.operacao!==tabActive) return false;
-      if(f.busca && !(`${i.titulo} ${i.descricao} ${i.bairro} ${i.ref||''}`.toLowerCase().includes(f.busca.toLowerCase())) ) return false;
-      if(f.cidade && i.cidade!==f.cidade) return false;
-      if(f.tipo && i.tipo!==f.tipo) return false;
-      if(f.pet && i.pet!==f.pet) return false;
-      if(f.condominio && i.condominio!==f.condominio) return false;
-      if(f.precoMin && p<Number(f.precoMin)) return false;
-      if(f.precoMax && p>Number(f.precoMax)) return false;
-      return true;
-    });
-    renderLista(dFiltrado);
-  }
-  ["busca","filtroCidade","filtroTipo","filtroPet","filtroCondo","filtroPrecoMin","filtroPrecoMax"].forEach(id=>{
-    const el=document.getElementById(id);
-    el.addEventListener(el.tagName==="INPUT"?"input":"change",atualizarFiltros);
-  });
+  tabs.querySelector(".tab").classList.add("active");
 
   // Destaques
   const destaquesContainer=document.getElementById("destaques");
@@ -214,7 +160,7 @@ Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
   }
   renderDestaques();
 
-  // Seta
+  // Setas carrossel
   const cardWidth=destaquesContainer.querySelector(".destaque-card")?.offsetWidth+10||130;
   document.querySelector(".destaque-left").onclick=()=>destaquesContainer.scrollBy({left:-cardWidth,behavior:"smooth"});
   document.querySelector(".destaque-right").onclick=()=>destaquesContainer.scrollBy({left:cardWidth,behavior:"smooth"});
@@ -228,6 +174,7 @@ Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
     if(Math.abs(diff)>30){destaquesContainer.scrollBy({left:diff>0?cardWidth:-cardWidth,behavior:"smooth"});startX=e.touches[0].clientX;}
   });
   destaquesContainer.addEventListener("touchend",()=>{isDragging=false;});
+
 }});
 </script>
 </body>
