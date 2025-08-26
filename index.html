@@ -304,7 +304,7 @@ class Destaques{
 
 // ==================== CARREGAR CSV ====================
 Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
-  const dados=res.data.map(i=>{
+  const dados=res.data.slice(1).map(i=>{
     i.ref=i.ref||""; 
     i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não";
     i.condominio=(i.cond_incluso&&["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase()))?"Sim":"Não";
