@@ -9,6 +9,8 @@
 body { font-family:'Segoe UI', sans-serif; background:#f4f6f8; margin:0; padding:0; }
 #imoveis-app input,#imoveis-app select{padding:8px 10px;margin:5px 0 15px 0;border-radius:6px;border:1px solid #ccc;font-size:14px;width:100%;box-sizing:border-box;}
 #lista{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:30px;padding:0 10px;}
+
+/* ==================== CARD ==================== */
 .card{border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.1);overflow:hidden;background:#fff;transition:transform 0.2s,box-shadow 0.2s;display:flex;flex-direction:column;}
 .card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,0.2);}
 .card img{width:100%;height:180px;object-fit:cover;}
@@ -18,6 +20,8 @@ body { font-family:'Segoe UI', sans-serif; background:#f4f6f8; margin:0; padding
 .card p.preco{font-weight:bold;color:#2d89ef;font-size:15px;}
 .btn-detalhes, .modal-content .btn-whatsapp{display:block;margin:10px auto 0 auto;background:#25D366;color:#fff;text-align:center;padding:8px 20px;border-radius:6px;font-weight:bold;text-decoration:none;cursor:pointer;font-size:14px;}
 .modal-content .btn-whatsapp:hover{background:#1da851;}
+
+/* ==================== MODAL ==================== */
 .modal{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.7);overflow-x:hidden;}
 .modal-content{background:#fff;padding:15px;border-radius:12px;width:95%;max-width:400px;max-height:90vh;overflow-y:auto;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);box-sizing:border-box;}
 .modal-content img{width:100%;max-width:100%;max-height:250px;object-fit:cover;border-radius:8px;margin-bottom:10px;cursor:pointer;transition:transform 0.3s;}
@@ -31,10 +35,14 @@ body { font-family:'Segoe UI', sans-serif; background:#f4f6f8; margin:0; padding
 .miniaturas img.selected{border-color:#2d89ef;}
 .close{color:#aaa;position:absolute;top:8px;right:15px;font-size:24px;font-weight:bold;cursor:pointer;}
 .close:hover{color:#000;}
+
+/* ==================== TABS & FILTROS ==================== */
 .nav-arrow{font-size:24px;background:rgba(0,0,0,0.3);}
 .tab{display:inline-block;padding:6px 12px;cursor:pointer;border-radius:6px;background:#eee;margin-right:5px;font-weight:bold;font-size:14px;}
 .tab.active{background:#2d89ef;color:#fff;}
 .ordenacao-select{padding:6px 10px;border-radius:6px;border:1px solid #ccc;font-size:14px;margin-bottom:10px;width:100%;box-sizing:border-box;}
+
+/* ==================== CARROSSEL ==================== */
 #destaques-container{position:relative;margin-top:15px;}
 #destaques{display:flex;gap:12px;overflow-x:auto;scroll-behavior:smooth;padding:0 40px;}
 #destaques .destaque-card{min-width:160px;flex:0 0 auto;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.1);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
@@ -44,11 +52,14 @@ body { font-family:'Segoe UI', sans-serif; background:#f4f6f8; margin:0; padding
 #destaques-container .destaque-left,#destaques-container .destaque-right{position:absolute;top:50%;transform:translateY(-50%);font-size:28px;color:#fff;background:rgba(0,0,0,0.4);padding:6px 12px;border-radius:50%;cursor:pointer;z-index:10;}
 #destaques-container .destaque-left{left:5px;}
 #destaques-container .destaque-right{right:5px;}
+
+/* ==================== WHATSAPP FLUTUANTE ==================== */
 #whatsapp-flutuante{position:fixed;bottom:15px;right:15px;width:50px;height:50px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;}
 #whatsapp-flutuante img{width:30px;height:30px;}
 </style>
 </head>
 <body>
+
 <div id="imoveis-app">
   <div id="tabs-container"></div>
   <div id="filtros-container"></div>
@@ -73,16 +84,97 @@ body { font-family:'Segoe UI', sans-serif; background:#f4f6f8; margin:0; padding
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <script>
-const csvUrl="https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv";
-const whatsappNumber="5512992468636";
+const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv";
+const whatsappNumber = "5512992468636";
 
-/* ==================== CLASSES COMPLETAS ==================== */
+/* ==================== MODAL ==================== */
+class ModalImovel{
+  constructor(id){
+    this.modal=document.getElementById(id);
+    this.body=this.modal.querySelector("#modal-body");
+    this.close=this.modal.querySelector(".close");
+    this.close.onclick=()=>this.fechar();
+    window.onclick=e=>{if(e.target==this.modal)this.fechar();};
+  }
+  fechar(){this.modal.style.display="none";document.body.style.overflow="";}
+  abrir(imovel){
+    const imgs=imovel.imagens.split(" ").filter(i=>i);
+    let idxImg=0;
+    this.body.innerHTML=`
+      <h2>${imovel.titulo}</h2>
+      <p><b>Código:</b> ${imovel.ref||''}</p>
+      <p><b>Preço:</b> R$ ${Number(imovel.preco).toLocaleString()} | <b>Cidade:</b> ${imovel.cidade} | <b>Bairro:</b> ${imovel.bairro} | <b>Tipo:</b> ${imovel.tipo} | <b>Operação:</b> ${imovel.operacao}</p>
+      <p><b>Área:</b> ${imovel.area}m² | <b>Quartos:</b> ${imovel.quartos} | <b>Banheiros:</b> ${imovel.banheiros} | <b>Garagem:</b> ${imovel.garagem} | <b>Condomínio:</b> ${imovel.condominio} | <b>Pet:</b> ${imovel.pet}</p>
+      <p>${imovel.descricao}</p>
+      <div style="position:relative;overflow:hidden;">
+        <img id="main-img" src="${imgs[0]||'https://via.placeholder.com/400x250'}">
+        <span class="nav-arrow nav-left">&#10094;</span>
+        <span class="nav-arrow nav-right">&#10095;</span>
+      </div>
+      <div class="miniaturas">${imgs.map((s,i)=>`<img src="${s}" class="${i===0?'selected':''}">`).join('')}</div>
+      <a class="btn-whatsapp" href="https://api.whatsapp.com/send?phone=${whatsappNumber}&text=Olá,%20interessei-me%20no%20imóvel%20${imovel.titulo}" target="_blank">WhatsApp</a>
+    `;
+    const main=this.body.querySelector("#main-img");
+    const mini=this.body.querySelectorAll(".miniaturas img");
+    const left=this.body.querySelector(".nav-left");
+    const right=this.body.querySelector(".nav-right");
+    let isZoomed=false,startX=0,startY=0,translateX=0,translateY=0,idxImg=0;
 
-/* ModalImovel, ListaImoveis já explicadas acima */
+    const update=i=>{ main.src=imgs[i]; mini.forEach((m,j)=>m.classList.toggle("selected",i===j)); idxImg=i; resetZoom(); };
+    mini.forEach((m,i)=>m.onclick=()=>update(i));
+    left.onclick=()=>update((idxImg-1+imgs.length)%imgs.length);
+    right.onclick=()=>update((idxImg+1)%imgs.length);
 
+    const toggleZoom=(clientX,clientY)=>{
+      isZoomed=!isZoomed;
+      main.classList.toggle("zoomed",isZoomed);
+      main.style.cursor=isZoomed?"move":"zoom-in";
+      if(isZoomed){ document.body.style.overflow="hidden"; main.style.transformOrigin=`${((clientX-main.getBoundingClientRect().left)/main.clientWidth)*100}% ${((clientY-main.getBoundingClientRect().top)/main.clientHeight)*100}%`; translateX=0; translateY=0; main.style.transform="scale(2) translate(0px,0px)"; }
+      else{ document.body.style.overflow=""; main.style.transform="scale(1) translate(0px,0px)"; translateX=0; translateY=0; }
+    };
+    const resetZoom=()=>{ isZoomed=false; main.classList.remove("zoomed"); main.style.cursor="zoom-in"; main.style.transform="scale(1) translate(0px,0px)"; translateX=0; translateY=0; document.body.style.overflow=""; };
+    main.onclick=e=>{if(!e.ctrlKey) toggleZoom(e.clientX,e.clientY);};
+    const limitTranslate=()=>{ if(!isZoomed) return; const rect=main.getBoundingClientRect(), parent=main.parentElement.getBoundingClientRect(), maxX=(rect.width-parent.width)/2,maxY=(rect.height-parent.height)/2; translateX=Math.min(Math.max(translateX,-maxX),maxX); translateY=Math.min(Math.max(translateY,-maxY),maxY); };
+    let dragging=false;
+    main.addEventListener("mousedown",e=>{if(isZoomed){dragging=true;startX=e.clientX-translateX;startY=e.clientY-translateY;main.style.cursor="grabbing";}});
+    window.addEventListener("mousemove",e=>{if(dragging){translateX=e.clientX-startX;translateY=e.clientY-startY;limitTranslate();main.style.transform=`scale(2) translate(${translateX}px,${translateY}px)`;}});
+    window.addEventListener("mouseup",e=>{if(dragging){dragging=false;main.style.cursor="move";}});
+    main.addEventListener("touchstart",e=>{if(e.touches.length===1&&isZoomed){startX=e.touches[0].clientX-translateX;startY=e.touches[0].clientY-translateY;}});
+    main.addEventListener("touchmove",e=>{if(e.touches.length===1&&isZoomed){e.preventDefault();translateX=e.touches[0].clientX-startX;translateY=e.touches[0].clientY-startY;limitTranslate();main.style.transform=`scale(2) translate(${translateX}px,${translateY}px)`;}});
+    this.modal.style.display="block";
+  }
+}
+
+/* ==================== LISTA ==================== */
+class ListaImoveis{
+  constructor(id,modal){ this.lista=document.getElementById(id); this.modal=modal; this.filteredData=[]; }
+  render(dados,filtro={},tab=""){
+    this.lista.innerHTML="";
+    this.filteredData=dados.filter(i=>{
+      const p=Number(i.preco);
+      if(tab!="" && i.operacao!==tab) return false;
+      if(filtro.busca && !(`${i.titulo} ${i.descricao} ${i.bairro} ${i.ref||''}`.toLowerCase().includes(filtro.busca.toLowerCase()))) return false;
+      if(filtro.cidade && i.cidade!==filtro.cidade) return false;
+      if(filtro.tipo && i.tipo!==filtro.tipo) return false;
+      if(filtro.pet && i.pet!==filtro.pet) return false;
+      if(filtro.condominio && i.condominio!==filtro.condominio) return false;
+      if(filtro.precoMin && p<Number(filtro.precoMin)) return false;
+      if(filtro.precoMax && p>Number(filtro.precoMax)) return false;
+      return true;
+    });
+    this.filteredData.forEach(i=>{
+      const c=document.createElement("div"); c.className="card";
+      c.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/400x250'}"><div class="card-body"><h3>${i.titulo}</h3><p class="preco">R$ ${Number(i.preco).toLocaleString()}</p><p>${i.cidade} | ${i.tipo}</p><button class="btn-detalhes">Detalhes</button></div>`;
+      c.querySelector(".btn-detalhes").onclick=()=>this.modal.abrir(i);
+      this.lista.appendChild(c);
+    });
+  }
+}
+
+//* ==================== Filtro ==================== */
 class FiltroImoveis{
   constructor(id,dados,lista){
-    this.c=document.getElementById(id);this.dados=dados;this.lista=lista;
+    this.c=document.getElementById(id); this.dados=dados; this.lista=lista;
     const cidades=[...new Set(dados.map(i=>i.cidade))];
     const tipos=[...new Set(dados.map(i=>i.tipo))];
     this.c.innerHTML=`<input id="busca" placeholder="Tít., desc., bairro ou código">
@@ -92,14 +184,8 @@ class FiltroImoveis{
       <select id="filtroCondo"><option value="">Condomínio Incluso?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
       <input id="filtroPrecoMin" type="number" placeholder="Preço mínimo">
       <input id="filtroPrecoMax" type="number" placeholder="Preço máximo">`;
-    const update=()=>{
-      const f={busca:this.c.querySelector("#busca").value,
-               cidade:this.c.querySelector("#filtroCidade").value,
-               tipo:this.c.querySelector("#filtroTipo").value,
-               pet:this.c.querySelector("#filtroPet").value,
-               condominio:this.c.querySelector("#filtroCondo").value,
-               precoMin:this.c.querySelector("#filtroPrecoMin").value,
-               precoMax:this.c.querySelector("#filtroPrecoMax").value};
+    const update=()=>{ 
+      const f={ busca:this.c.querySelector("#busca").value, cidade:this.c.querySelector("#filtroCidade").value, tipo:this.c.querySelector("#filtroTipo").value, pet:this.c.querySelector("#filtroPet").value, condominio:this.c.querySelector("#filtroCondo").value, precoMin:this.c.querySelector("#filtroPrecoMin").value, precoMax:this.c.querySelector("#filtroPrecoMax").value };
       const tab=document.querySelector(".tab.active")?.dataset.tab||"";
       this.lista.render(this.dados,f,tab);
     }
@@ -111,11 +197,11 @@ class FiltroImoveis{
   }
 }
 
+//* ==================== Tabs ==================== */
 class TabsImoveis{
   constructor(id,dados,lista){
-    this.c=document.getElementById(id);this.dados=dados;this.lista=lista;
-    const tabs=[...new Set(dados.map(i=>i.operacao))];
-    tabs.unshift("Todos");this.c.innerHTML="";
+    this.c=document.getElementById(id); this.dados=dados; this.lista=lista;
+    const tabs=[...new Set(dados.map(i=>i.operacao))]; tabs.unshift("Todos"); this.c.innerHTML="";
     tabs.forEach(tab=>{
       const t=document.createElement("span"); t.className="tab"; t.dataset.tab=(tab==="Todos"?"":tab); t.textContent=tab.charAt(0).toUpperCase()+tab.slice(1).toLowerCase();
       t.onclick=()=>{ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); t.classList.add("active"); const f={}; this.lista.render(this.dados,f,t.dataset.tab); };
@@ -125,6 +211,7 @@ class TabsImoveis{
   }
 }
 
+//* ==================== Ordenação ==================== */
 class OrdenacaoImoveis{
   constructor(id,lista){
     this.c=document.getElementById(id); this.lista=lista;
@@ -145,7 +232,7 @@ class OrdenacaoImoveis{
   }
 }
 
-/* Destaques infinito suave */
+/* ==================== CARROSSEL INFINITO SUAVE ==================== */
 class Destaques{
   constructor(imoveis){ this.i=imoveis.slice(0,10); this.renderDestaques(); }
   renderDestaques(){
@@ -169,9 +256,9 @@ class Destaques{
 }
 
 /* ==================== CARREGAR CSV ==================== */
-Papa.parse(csvUrl,{ download:true, header:true, complete:res=>{
-  const allData=res.data.slice(1);
-  const dados=allData.map(i=>{
+Papa.parse(csvUrl,{ download:true, header:true, complete: res=>{
+  const allData = res.data.slice(1);
+  const dados = allData.map(i=>{
     i.ref=i.ref||""; 
     i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não";
     i.condominio=(i.cond_incluso&&["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase()))?"Sim":"Não";
@@ -189,5 +276,6 @@ Papa.parse(csvUrl,{ download:true, header:true, complete:res=>{
   new Destaques(dados);
 }});
 </script>
+
 </body>
 </html>
