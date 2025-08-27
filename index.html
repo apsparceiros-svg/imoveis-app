@@ -4,258 +4,551 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>App de Imóveis - Mobile & Desktop</title>
-<title>App de Imóveis - Completo</title>
 <style>
-body { font-family: 'Segoe UI', sans-serif; background:#f4f6f8; margin:0; padding:0; }
-#lista { display:grid; grid-template-columns:1fr; gap:16px; margin-bottom:30px; padding:0 10px; }
-body { font-family:'Segoe UI',sans-serif; background:#f4f6f8; margin:0; padding:0; }
-#lista { display:grid; grid-template-columns:1fr; gap:16px; padding:0 10px; margin-bottom:30px; }
-.card { border-radius:12px; background:#fff; box-shadow:0 6px 18px rgba(0,0,0,0.1); transition:0.2s; display:flex; flex-direction:column; }
-.card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.2); }
-.card img { width:100%; height:180px; object-fit:cover; }
-@@ -19,35 +19,45 @@
+/* ==================== RESET & GERAL ==================== */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 0;
+}
+#imoveis-app input, #imoveis-app select {
+    padding: 8px 10px;
+    margin: 5px 0 15px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+#lista {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
 
-.modal { display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.7); overflow:auto; }
-.modal-content { background:#fff; padding:15px; border-radius:12px; width:95%; max-width:400px; max-height:90vh; overflow-y:auto; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); box-sizing:border-box; }
-.modal-content img { width:100%; max-height:250px; object-fit:cover; border-radius:8px; margin-bottom:10px; cursor:pointer; transition: transform 0.3s; }
-.modal-content img.zoomed { transform: scale(2); cursor:move; }
-.close { color:#aaa; position:absolute; top:8px; right:15px; font-size:24px; font-weight:bold; cursor:pointer; }
-.close:hover { color:#000; }
+/* ==================== CARD ==================== */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    overflow: hidden;
+    background: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+.card-body {
+    padding: 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.card h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #1a1a1a;
+}
+.card p {
+    margin: 4px 0;
+    color: #555;
+    font-size: 13px;
+}
+.card p.preco {
+    font-weight: bold;
+    color: #2d89ef;
+    font-size: 15px;
+}
+.btn-detalhes, .modal-content .btn-whatsapp {
+    display: block;
+    margin: 10px auto 0 auto;
+    background: #25D366;
+    color: #fff;
+    text-align: center;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+.modal-content .btn-whatsapp:hover {
+    background: #1da851;
+}
 
-#whatsapp-flutuante { position:fixed; right:15px; width:50px; height:50px; z-index:9998; cursor:pointer; }
-.tab { display:inline-block; padding:6px 12px; cursor:pointer; border-radius:6px; background:#eee; margin-right:5px; font-weight:bold; font-size:14px; }
-.tab.active { background:#2d89ef; color:#fff; }
-.ordenacao-select { padding:6px 10px; border-radius:6px; border:1px solid #ccc; font-size:14px; margin-bottom:10px; width:100%; }
+/* ==================== MODAL ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    overflow-x: hidden;
+}
+.modal-content {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    width: 95%;
+    max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    box-sizing: border-box;
+}
+.modal-content img {
+    width: 100%;
+    max-width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+.modal-content img.zoomed {
+    transform: scale(2);
+    cursor: move;
+}
+.modal-content img:hover:not(.zoomed) {
+    transform: scale(1.05);
+}
+.modal-content .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+    padding: 4px 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    z-index: 5;
+}
+.modal-content .nav-left { left: 8px; } 
+.modal-content .nav-right { right: 8px; }
 
-#whatsapp-flutuante { position:fixed; right:15px; width:50px; height:50px; z-index:9998; cursor:pointer; transition: transform 0.2s; }
-#whatsapp-flutuante img { width:100%; height:100%; border-radius:50%; }
+.miniaturas {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+.miniaturas img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border 0.2s;
+}
+.miniaturas img.selected { border-color: #2d89ef; }
 
-#destaques-container { position:relative; margin:15px 0; }
-#destaques { display:flex; gap:12px; overflow-x:auto; scroll-behavior:smooth; padding:0 40px; }
-.destaque-card { min-width:160px; flex:0 0 auto; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.1); cursor:pointer; transition:0.2s; }
-.destaque-card:hover { transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,0.2); }
-#destaques-container { position:relative; margin:15px 0; overflow:hidden; height:140px; }
-#destaques { display:flex; gap:12px; transition:transform 0.2s linear; }
-.destaque-card { min-width:160px; flex:0 0 auto; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.1); cursor:pointer; }
-.destaque-card img { width:100%; height:100px; object-fit:cover; }
-.destaque-card p { padding:6px; margin:0; font-size:12px; font-weight:bold; color:#2d89ef; text-align:center; }
+.close {
+    color: #aaa;
+    position: absolute;
+    top: 8px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover { color: #000; }
 
-.destaque-left, .destaque-right { position:absolute; top:50%; transform:translateY(-50%); font-size:28px; color:#fff; background:rgba(0,0,0,0.4); padding:6px 12px; border-radius:50%; cursor:pointer; z-index:10; }
-.destaque-left { left:5px; } .destaque-right { right:5px; }
+/* ==================== TABS & FILTROS ==================== */
+.nav-arrow {
+    font-size: 24px;
+    background: rgba(0,0,0,0.3);
+}
+.tab {
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    background: #eee;
+    margin-right: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+.tab.active {
+    background: #2d89ef;
+    color: #fff;
+}
+.ordenacao-select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-@media (min-width:600px) { #lista { grid-template-columns:repeat(2,1fr); } }
-@media (min-width:900px) { #lista { grid-template-columns:repeat(3,1fr); } }
-@media (min-width:600px){ #lista{ grid-template-columns:repeat(2,1fr); } }
-@media (min-width:900px){ #lista{ grid-template-columns:repeat(3,1fr); } }
-</style>
-</head>
-<body>
+/* ==================== CARROSSEL ==================== */
+#destaques-container {
+    position: relative;
+    margin-top: 15px;
+}
+#destaques {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 0 40px; /* espaço para setas */
+}
+#destaques .destaque-card {
+    min-width: 160px;
+    flex: 0 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+#destaques .destaque-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+#destaques .destaque-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+}
+#destaques .destaque-card p {
+    padding: 6px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+    color: #2d89ef;
+    text-align: center;
+}
 
-<!-- Carrossel no topo -->
-<div id="destaques-container">
-  <span class="destaque-left">&#10094;</span>
-  <div id="destaques"></div>
-  <span class="destaque-right">&#10095;</span>
-</div>
+/* Setas fora do carrossel */
+#destaques-container .destaque-left,
+#destaques-container .destaque-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    color: #fff;
+    background: rgba(0,0,0,0.4);
+    padding: 6px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10;
+}
+#destaques-container .destaque-left { left: 5px; }
+#destaques-container .destaque-right { right: 5px; }
 
-<!-- Filtros e lista -->
-<div id="imoveis-app">
-  <div id="tabs-container"></div>
-  <div id="filtros-container"></div>
-  <div id="ordenacao-container"></div>
-  <div id="lista"></div>
+/* ==================== WHATSAPP FLUTUANTE ==================== */
+#whatsapp-flutuante {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+@@ -329,240 +328,286 @@
+const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv";
+const whatsappNumber = "5512992468636";
 
-  <div id="detalhesModal" class="modal">
-@@ -64,68 +74,140 @@
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script>
-// WhatsApp flutuante
+/* ==================== BOTÃO WHATSAPP FLUTUANTE ==================== */
 const whatsapp = document.getElementById('whatsapp-flutuante');
-let targetY = window.innerHeight - 80, currentY = targetY;
-function animate() { currentY += (targetY-currentY)*0.1; whatsapp.style.top = currentY + "px"; requestAnimationFrame(animate); }
+
+// Configuração: tempo em ms para voltar a seguir a rolagem
+const idleDelay = 3000; // 3 segundos
+
+let targetY = window.innerHeight - 80; 
+let currentY = targetY;
+let lastMove = Date.now();
+
+// Animação suave
+function animate() {
+  const now = Date.now();
+
+  // Se passou do tempo configurado sem mexer o mouse → segue rolagem
+  if (now - lastMove > idleDelay) {
+    targetY = window.scrollY + window.innerHeight - 80;
+  }
+
+  // suavização do movimento
+  currentY += (targetY - currentY) * 0.1;
+  whatsapp.style.top = currentY + "px";
+
+  requestAnimationFrame(animate);
+}
 animate();
-document.addEventListener('mousemove', e => { targetY = e.clientY - 25; if(targetY<15) targetY=15; if(targetY>window.scrollY+window.innerHeight-65) targetY=window.scrollY+window.innerHeight-65; });
-function animateWA(){ currentY += (targetY-currentY)*0.1; whatsapp.style.top = currentY + "px"; requestAnimationFrame(animateWA); }
-animateWA();
-document.addEventListener('mousemove', e=>{ targetY = e.clientY - 25; if(targetY<15) targetY=15; if(targetY>window.scrollY+window.innerHeight-65) targetY=window.scrollY+window.innerHeight-65; });
-window.addEventListener('scroll', ()=>{ targetY = Math.min(targetY, window.scrollY + window.innerHeight - 65); });
 
-// Modal
-const modal = document.getElementById("detalhesModal");
-const modalBody = document.getElementById("modal-body");
-const closeBtn = modal.querySelector(".close");
-function abrirModal(imovel){
-  modalBody.innerHTML = `<h2>${imovel.titulo}</h2><p>R$ ${Number(imovel.preco).toLocaleString()}</p>`;
-  modal.style.display="block"; whatsapp.style.display="none";
-}
-function fecharModal(){ modal.style.display="none"; whatsapp.style.display="block"; }
-closeBtn.onclick = fecharModal;
-window.onclick = e=>{ if(e.target===modal) fecharModal(); }
+// Segue o mouse no eixo Y
+document.addEventListener('mousemove', e => {
+  targetY = e.clientY - 25;
+  lastMove = Date.now();
 
-// Lista de imóveis
-class ListaImoveis {
-  constructor(id){ this.lista=document.getElementById(id); this.filteredData=[]; }
-  render(dados){ this.lista.innerHTML=""; this.filteredData=dados; this.filteredData.forEach(i=>{
-    const c=document.createElement("div"); c.className="card";
-    c.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/400x250'}"><div class="card-body"><h3>${i.titulo}</h3><p class="preco">R$ ${Number(i.preco).toLocaleString()}</p><button class="btn-detalhes">Detalhes</button></div>`;
-    c.querySelector(".btn-detalhes").onclick=()=> abrirModal(i);
-    this.lista.appendChild(c);
-  }); }
-}
+  // Mantém sempre dentro da viewport
+  if (targetY < 15) targetY = 15;
+  if (targetY > window.scrollY + window.innerHeight - 65) {
+    targetY = window.scrollY + window.innerHeight - 65;
+  }
+});
 
-// Carrossel de destaques
-class Destaques{
-  constructor(dados){
-    const container = document.getElementById("destaques");
-    const cardsHTML = dados.slice(0,10).map(i=>`<div class="destaque-card"><img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/200x120'}"><p>${i.titulo} - R$ ${Number(i.preco).toLocaleString()}</p></div>`).join('');
-    container.innerHTML = cardsHTML;
-    const allCards = container.querySelectorAll(".destaque-card");
-    allCards.forEach((card, idx)=>card.onclick = ()=> abrirModal(dados[idx]));
-    const cardWidth = container.querySelector(".destaque-card").offsetWidth + 12;
-    const left = document.querySelector(".destaque-left");
-    const right = document.querySelector(".destaque-right");
-    const scrollByCard = (amount)=>{ container.scrollBy({ left: amount, behavior:'smooth' }); };
-    left.onclick = ()=>scrollByCard(-cardWidth); right.onclick = ()=>scrollByCard(cardWidth);
-    setInterval(()=>scrollByCard(cardWidth),4000);
+// Ajusta quando a tela é redimensionada
+window.addEventListener('resize', () => {
+  if (targetY > window.scrollY + window.innerHeight - 65) {
+    targetY = window.scrollY + window.innerHeight - 65;
+  }
+});
 
-    // Swipe
-    let startX=0, dragging=false;
-    container.addEventListener("touchstart",e=>{ startX = e.touches[0].clientX; dragging=true; });
-    container.addEventListener("touchmove",e=>{ if(!dragging) return; const diff = startX - e.touches[0].clientX; if(Math.abs(diff)>30){ scrollByCard(diff>0?cardWidth:-cardWidth); startX=e.touches[0].clientX; }});
-    container.addEventListener("touchend",()=>{ dragging=false; });
-// ================= MODAL =================
-class ModalImovel{
-  constructor(id){
+// ==================== CLASSES ====================
+
+// Modal completo com zoom e miniaturas
+class ModalImovel {
+  constructor(id) {
     this.modal=document.getElementById(id);
     this.body=this.modal.querySelector("#modal-body");
     this.close=this.modal.querySelector(".close");
     this.close.onclick=()=>this.fechar();
     window.onclick=e=>{if(e.target==this.modal)this.fechar();};
   }
+  fechar(){this.modal.style.display="none";document.body.style.overflow="";}
   abrir(imovel){
-    const imgs = imovel.imagens.split(" ").filter(i=>i);
+    const imgs=imovel.imagens.split(" ").filter(i=>i);
     let idxImg=0;
     this.body.innerHTML=`
       <h2>${imovel.titulo}</h2>
-      <p><b>Preço:</b> R$ ${Number(imovel.preco).toLocaleString()}</p>
+      <p><b>Código:</b> ${imovel.ref||''}</p>
+      <p><b>Preço:</b> R$ ${Number(imovel.preco).toLocaleString()} | <b>Cidade:</b> ${imovel.cidade} | <b>Bairro:</b> ${imovel.bairro} | <b>Tipo:</b> ${imovel.tipo} | <b>Operação:</b> ${imovel.operacao}</p>
+      <p><b>Área:</b> ${imovel.area}m² | <b>Quartos:</b> ${imovel.quartos} | <b>Banheiros:</b> ${imovel.banheiros} | <b>Garagem:</b> ${imovel.garagem} | <b>Condomínio:</b> ${imovel.condominio} | <b>Pet:</b> ${imovel.pet}</p>
+      <p>${imovel.descricao}</p>
       <div style="position:relative; overflow:hidden;">
         <img id="main-img" src="${imgs[0]||'https://via.placeholder.com/400x250'}">
         <span class="nav-arrow nav-left">&#10094;</span>
         <span class="nav-arrow nav-right">&#10095;</span>
       </div>
       <div class="miniaturas">${imgs.map((s,i)=>`<img src="${s}" class="${i===0?'selected':''}">`).join('')}</div>
-      <a class="btn-whatsapp" href="https://api.whatsapp.com/send?phone=5512992468636&text=Olá,%20interessei-me%20no%20imóvel%20${imovel.titulo}" target="_blank">WhatsApp</a>
+      <a class="btn-whatsapp" href="https://api.whatsapp.com/send?phone=${whatsappNumber}&text=Olá,%20interessei-me%20no%20imóvel%20${imovel.titulo}" target="_blank">WhatsApp</a>
     `;
-    whatsapp.style.display="none";
     const main=this.body.querySelector("#main-img");
     const mini=this.body.querySelectorAll(".miniaturas img");
     const left=this.body.querySelector(".nav-left");
     const right=this.body.querySelector(".nav-right");
-    let isZoomed=false, startX=0, startY=0, translateX=0, translateY=0;
-    const update=i=>{ main.src=imgs[i]; mini.forEach((m,j)=>m.classList.toggle("selected",i===j)); idxImg=i; resetZoom(); };
+    const update=i=>{main.src=imgs[i];mini.forEach((m,j)=>m.classList.toggle("selected",i===j)); idxImg=i; resetZoom();};
     mini.forEach((m,i)=>m.onclick=()=>update(i));
     left.onclick=()=>update((idxImg-1+imgs.length)%imgs.length);
     right.onclick=()=>update((idxImg+1)%imgs.length);
 
+    let isZoomed=false,startX=0,startY=0,translateX=0,translateY=0;
+    main.style.transition="transform 0.3s ease";
+    main.style.cursor="zoom-in";
     const toggleZoom=(clientX,clientY)=>{
       isZoomed=!isZoomed;
       main.classList.toggle("zoomed",isZoomed);
       main.style.cursor=isZoomed?"move":"zoom-in";
-      if(isZoomed){ document.body.style.overflow="hidden"; main.style.transformOrigin=`${((clientX-main.getBoundingClientRect().left)/main.clientWidth)*100}% ${((clientY-main.getBoundingClientRect().top)/main.clientHeight)*100}%`; translateX=0; translateY=0; main.style.transform="scale(2) translate(0px,0px)"; }
-      else { document.body.style.overflow=""; main.style.transform="scale(1) translate(0px,0px)"; translateX=0; translateY=0; }
+      if(isZoomed){document.body.style.overflow="hidden";
+        main.style.transformOrigin=`${((clientX-main.getBoundingClientRect().left)/main.clientWidth)*100}% ${((clientY-main.getBoundingClientRect().top)/main.clientHeight)*100}%`;
+        translateX=0; translateY=0; main.style.transform="scale(2) translate(0px,0px)";
+      } else {document.body.style.overflow=""; main.style.transform="scale(1) translate(0px,0px)"; translateX=0; translateY=0;}
     }
-    const resetZoom=()=>{ isZoomed=false; main.classList.remove("zoomed"); main.style.cursor="zoom-in"; main.style.transform="scale(1) translate(0px,0px)"; translateX=0; translateY=0; document.body.style.overflow=""; }
-    main.onclick=e=>{ if(!e.ctrlKey) toggleZoom(e.clientX,e.clientY); }
-    const limitTranslate=()=>{ if(!isZoomed) return; const rect=main.getBoundingClientRect(), parent=main.parentElement.getBoundingClientRect(), maxX=(rect.width-parent.width)/2, maxY=(rect.height-parent.height)/2; translateX=Math.min(Math.max(translateX,-maxX),maxX); translateY=Math.min(Math.max(translateY,-maxY),maxY); }
+    const resetZoom=()=>{isZoomed=false;main.classList.remove("zoomed");main.style.cursor="zoom-in";main.style.transform="scale(1) translate(0px,0px)";translateX=0;translateY=0;document.body.style.overflow="";}
+    main.onclick=e=>{if(!e.ctrlKey) toggleZoom(e.clientX,e.clientY);}
+    const limitTranslate=()=>{if(!isZoomed)return;const rect=main.getBoundingClientRect(),parent=main.parentElement.getBoundingClientRect(),maxX=(rect.width-parent.width)/2,maxY=(rect.height-parent.height)/2;translateX=Math.min(Math.max(translateX,-maxX),maxX);translateY=Math.min(Math.max(translateY,-maxY),maxY);}
     let dragging=false;
-    main.addEventListener("mousedown",e=>{ if(isZoomed){ dragging=true; startX=e.clientX-translateX; startY=e.clientY-translateY; main.style.cursor="grabbing"; }});
-    window.addEventListener("mousemove", e=>{ if(dragging){ translateX=e.clientX-startX; translateY=e.clientY-startY; limitTranslate(); main.style.transform=`scale(2) translate(${translateX}px,${translateY}px)`; }});
-    window.addEventListener("mouseup", e=>{ if(dragging){ dragging=false; main.style.cursor="move"; }});
-    main.addEventListener("touchstart", e=>{ if(e.touches.length===1&&isZoomed){ startX=e.touches[0].clientX-translateX; startY=e.touches[0].clientY-translateY; }});
-    main.addEventListener("touchmove", e=>{ if(e.touches.length===1&&isZoomed){ e.preventDefault(); translateX=e.touches[0].clientX-startX; translateY=e.touches[0].clientY-startY; limitTranslate(); main.style.transform=`scale(2) translate(${translateX}px,${translateY}px)`; }});
+    main.addEventListener("mousedown",e=>{if(isZoomed){dragging=true;startX=e.clientX-translateX;startY=e.clientY-translateY;main.style.cursor="grabbing";}});
+    window.addEventListener("mousemove",e=>{if(dragging){translateX=e.clientX-startX;translateY=e.clientY-startY;limitTranslate();main.style.transform=`scale(2) translate(${translateX}px,${translateY}px)`;}});
+    window.addEventListener("mouseup",e=>{if(dragging){dragging=false;main.style.cursor="move";}});
+    main.addEventListener("touchstart",e=>{if(e.touches.length===1&&isZoomed){startX=e.touches[0].clientX-translateX;startY=e.touches[0].clientY-translateY;}});
+    main.addEventListener("touchmove",e=>{if(e.touches.length===1&&isZoomed){e.preventDefault();translateX=e.touches[0].clientX-startX;translateY=e.touches[0].clientY-startY;limitTranslate();main.style.transform=`scale(2) translate(${translateX}px,${translateY}px)`;}});
     this.modal.style.display="block";
   }
-  fechar(){ this.modal.style.display="none"; whatsapp.style.display="block"; document.body.style.overflow=""; }
 }
 
-// Carregar CSV
-Papa.parse("https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv",{ download:true, header:true, complete: res=>{
-  const dados = res.data.slice(1).map(i=>{ i.preco=i.preco||"0"; i.titulo=i.titulo||""; i.imagens=i.imagens||""; return i; });
-  const lista = new ListaImoveis("lista");
-  lista.render(dados);
-  new Destaques(dados);
-}});
-// ================= CARREGAR CSV E INICIALIZAÇÃO =================
-const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv";
+// Lista de imóveis
+class ListaImoveis{
+  constructor(id,modal){this.lista=document.getElementById(id);this.modal=modal;this.filteredData=[];}
+  render(dados,filtro={},tab=""){
+    this.lista.innerHTML="";
+    this.filteredData=dados.filter(i=>{
+      const p=Number(i.preco);
+      if(tab!="" && i.operacao!==tab) return false;
+      if(filtro.busca && !(`${i.titulo} ${i.descricao} ${i.bairro} ${i.ref || ''}`.toLowerCase().includes(filtro.busca.toLowerCase()))) return false;
+      if(filtro.cidade && i.cidade!==filtro.cidade) return false;
+      if(filtro.tipo && i.tipo!==filtro.tipo) return false;
+      if(filtro.pet && i.pet!==filtro.pet) return false;
+      if(filtro.condominio && i.condominio!==filtro.condominio) return false;
+      if(filtro.precoMin && p<Number(filtro.precoMin)) return false;
+      if(filtro.precoMax && p>Number(filtro.precoMax)) return false;
+      return true;
+    });
+    this.filteredData.forEach(i=>{
+      const c=document.createElement("div");
+      c.className="card";
+      c.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/400x250'}"><div class="card-body"><h3>${i.titulo}</h3><p class="preco">R$ ${Number(i.preco).toLocaleString()}</p><p>${i.cidade} | ${i.tipo}</p><button class="btn-detalhes">Detalhes</button></div>`;
+      c.querySelector(".btn-detalhes").onclick=()=>this.modal.abrir(i);
+      this.lista.appendChild(c);
+    });
+  }
+}
 
-Papa.parse(csvUrl,{ download:true, header:true,
-  complete: res=>{
-    const allData=res.data.slice(1);
-    const dados = allData.map(i=>{
+// Filtros
+class FiltroImoveis{
+  constructor(id,dados,lista){
+    this.c=document.getElementById(id);this.dados=dados;this.lista=lista;
+    const cidades=[...new Set(dados.map(i=>i.cidade))];
+    const tipos=[...new Set(dados.map(i=>i.tipo))];
+    this.c.innerHTML=`<input id="busca" placeholder="Tít., desc., bairro ou código">
+      <select id="filtroCidade"><option value="">Cidades</option>${cidades.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
+      <select id="filtroTipo"><option value="">Tipos de Imóveis</option>${tipos.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+      <select id="filtroPet"><option value="">Aceita Pet?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
+      <select id="filtroCondo"><option value="">Condomínio Incluso?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
+      <input id="filtroPrecoMin" type="number" placeholder="Preço mínimo">
+      <input id="filtroPrecoMax" type="number" placeholder="Preço máximo">`;
+    const update=()=>{
+      const f={busca:this.c.querySelector("#busca").value,
+               cidade:this.c.querySelector("#filtroCidade").value,
+               tipo:this.c.querySelector("#filtroTipo").value,
+               pet:this.c.querySelector("#filtroPet").value,
+               condominio:this.c.querySelector("#filtroCondo").value,
+               precoMin:this.c.querySelector("#filtroPrecoMin").value,
+               precoMax:this.c.querySelector("#filtroPrecoMax").value};
+      const tab=document.querySelector(".tab.active")?.dataset.tab||"";
+      this.lista.render(this.dados,f,tab);
+    }
+    ["busca","filtroCidade","filtroTipo","filtroPet","filtroCondo","filtroPrecoMin","filtroPrecoMax"].forEach(id=>{
+      const el=this.c.querySelector("#"+id);
+      el.tagName==="INPUT"?el.addEventListener("input",update):el.addEventListener("change",update);
+    });
+    update();
+  }
+}
+
+// Tabs
+class TabsImoveis{
+  constructor(id,dados,lista){
+    this.c=document.getElementById(id);this.dados=dados;this.lista=lista;
+    const tabs=[...new Set(dados.map(i=>i.operacao))];
+    tabs.unshift("Todos");this.c.innerHTML="";
+    tabs.forEach(tab=>{
+      const t=document.createElement("span"); t.className="tab"; t.dataset.tab=(tab==="Todos"?"":tab); t.textContent=tab.charAt(0).toUpperCase()+tab.slice(1).toLowerCase();
+      t.onclick=()=>{
+        document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+        t.classList.add("active");
+        const f={}; this.lista.render(this.dados,f,t.dataset.tab);
+      };
+      this.c.appendChild(t);
+    });
+    this.c.querySelector(".tab").classList.add("active");
+  }
+}
+
+// Ordenação
+class OrdenacaoImoveis{
+  constructor(id,lista){
+    this.c=document.getElementById(id); this.lista=lista;
+    this.c.innerHTML=`<select class="ordenacao-select" id="ordenar"><option value="">Ordenar por</option>
+      <option value="preco_asc">Preço Crescente</option>
+      <option value="preco_desc">Preço Decrescente</option>
+      <option value="area_asc">Área Crescente</option>
+      <option value="area_desc">Área Decrescente</option></select>`;
+    this.c.querySelector("#ordenar").addEventListener("change",e=>{
+      const val=e.target.value;
+      const data=this.lista.filteredData.slice();
+      if(val==="preco_asc") data.sort((a,b)=>Number(a.preco)-Number(b.preco));
+      if(val==="preco_desc") data.sort((a,b)=>Number(b.preco)-Number(a.preco));
+      if(val==="area_asc") data.sort((a,b)=>Number(a.area)-Number(b.area));
+      if(val==="area_desc") data.sort((a,b)=>Number(b.area)-Number(a.area));
+      this.lista.render(data);
+    });
+  }
+}
+
+// ==================== CARROSSEL COM SWIPE ====================
+class Destaques {
+    constructor(imoveis) {
+        this.i = imoveis;
+        this.renderDestaques();
+    }
+    renderDestaques() {
+        const container = document.getElementById("destaques");
+        if (!container) return;
+        const cardsHTML = this.i.slice(0, 10).map(imovel => `
+            <div class="destaque-card">
+                <img src="${imovel.imagens.split(" ")[0] || 'https://via.placeholder.com/200x120'}">
+                <p>${imovel.titulo} - R$ ${Number(imovel.preco).toLocaleString()}</p>
+            </div>
+        `).join('');
+        container.innerHTML = cardsHTML + cardsHTML;
+        const allCards = container.querySelectorAll(".destaque-card");
+        const modal = new ModalImovel("detalhesModal");
+        allCards.forEach((card, idx) => card.onclick = () => modal.abrir(this.i[idx % 10]));
+
+        const cardWidth = container.querySelector(".destaque-card")?.offsetWidth + 12 || 172;
+        const left = document.querySelector(".destaque-left");
+        const right = document.querySelector(".destaque-right");
+        const scrollByCard = (amount) => {
+            container.scrollBy({ left: amount, behavior: 'smooth' });
+            setTimeout(() => {
+                if (container.scrollLeft >= container.scrollWidth / 2) container.scrollLeft -= container.scrollWidth / 2;
+                if (container.scrollLeft <= 0) container.scrollLeft += container.scrollWidth / 2;
+            }, 300);
+        };
+        if (left) left.onclick = () => scrollByCard(-cardWidth);
+        if (right) right.onclick = () => scrollByCard(cardWidth);
+        setInterval(() => scrollByCard(cardWidth), 4000);
+
+        // SWIPE
+        let startX = 0;
+        let isDragging = false;
+        container.addEventListener("touchstart", e => { startX = e.touches[0].clientX; isDragging = true; });
+        container.addEventListener("touchmove", e => {
+            if (!isDragging) return;
+            const diff = startX - e.touches[0].clientX;
+            if (Math.abs(diff) > 30) { scrollByCard(diff > 0 ? cardWidth : -cardWidth); startX = e.touches[0].clientX; }
+        });
+        container.addEventListener("touchend", () => { isDragging = false; });
+    }
+}
+
+// ==================== CARREGAR CSV ====================
+Papa.parse(csvUrl,{
+  download:true,
+  header:true,
+  complete: res => {
+    const allData = res.data.slice(1);
+    const dados = allData.map(i => {
       i.ref=i.ref||""; 
       i.pet=(i.pet&&["sim","s","1"].includes(i.pet.trim().toLowerCase()))?"Sim":"Não";
       i.condominio=(i.cond_incluso&&["sim","s","1"].includes(i.cond_incluso.trim().toLowerCase()))?"Sim":"Não";
-      i.garagem=i.garagem||"0"; i.titulo=i.titulo||""; i.descricao=i.descricao||""; i.tipo=i.tipo||""; i.operacao=i.operacao||""; i.cidade=i.cidade||""; i.preco=i.preco||"0"; i.area=i.area||"0"; i.banheiros=i.banheiros||"0"; i.quartos=i.quartos||"0"; i.imagens=i.imagens||"";
+      i.garagem=i.garagem||"0"; i.titulo=i.titulo||""; i.descricao=i.descricao||"";
+      i.tipo=i.tipo||""; i.operacao=i.operacao||""; i.cidade=i.cidade||"";
+      i.preco=i.preco||"0"; i.area=i.area||"0"; i.banheiros=i.banheiros||"0"; i.quartos=i.quartos||"0";
+      i.imagens=i.imagens||"";
       return i;
     });
     const modal = new ModalImovel("detalhesModal");
-
-    // --- Lista ---
-    class ListaImoveis{
-      constructor(id,modal){ this.lista=document.getElementById(id); this.modal=modal; this.filteredData=[]; }
-      render(dados,filtro={},tab=""){
-        this.lista.innerHTML="";
-        this.filteredData=dados.filter(i=>{
-          if(tab && i.operacao!==tab) return false;
-          if(filtro.busca && !(`${i.titulo} ${i.descricao} ${i.bairro || ""} ${i.ref}`.toLowerCase().includes(filtro.busca.toLowerCase()))) return false;
-          if(filtro.cidade && i.cidade!==filtro.cidade) return false;
-          if(filtro.tipo && i.tipo!==filtro.tipo) return false;
-          if(filtro.pet && i.pet!==filtro.pet) return false;
-          if(filtro.condominio && i.condominio!==filtro.condominio) return false;
-          if(filtro.precoMin && Number(i.preco)<Number(filtro.precoMin)) return false;
-          if(filtro.precoMax && Number(i.preco)>Number(filtro.precoMax)) return false;
-          return true;
-        });
-        this.filteredData.forEach(i=>{
-          const c=document.createElement("div"); c.className="card";
-          c.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/400x250'}"><div class="card-body"><h3>${i.titulo}</h3><p class="preco">R$ ${Number(i.preco).toLocaleString()}</p><p>${i.cidade} | ${i.tipo}</p><button class="btn-detalhes">Detalhes</button></div>`;
-          c.querySelector(".btn-detalhes").onclick=()=>modal.abrir(i);
-          this.lista.appendChild(c);
-        });
-      }
-    }
-    const listaImoveis = new ListaImoveis("lista",modal);
-    listaImoveis.render(dados);
-
-    // --- Tabs ---
-    const tabsContainer = document.getElementById("tabs-container");
-    ["Venda","Aluguel"].forEach(tab=>{
-      const t=document.createElement("span"); t.className="tab"; t.textContent=tab;
-      t.onclick=()=>{ tabsContainer.querySelectorAll(".tab").forEach(x=>x.classList.remove("active")); t.classList.add("active"); listaImoveis.render(dados,{},tab); };
-      tabsContainer.appendChild(t);
-    });
-
-    // --- Filtros básicos ---
-    const filtrosContainer=document.getElementById("filtros-container");
-    filtrosContainer.innerHTML=`<input type="text" id="busca" placeholder="Buscar..." style="width:100%;padding:6px;margin-bottom:10px;border-radius:6px;border:1px solid #ccc;">`;
-    document.getElementById("busca").addEventListener("input",e=>listaImoveis.render(dados,{busca:e.target.value}));
-
-    // --- Destaques ---
-    const destaquesContainer=document.getElementById("destaques");
-    dados.slice(0,8).forEach(i=>{
-      const d=document.createElement("div"); d.className="destaque-card";
-      d.innerHTML=`<img src="${i.imagens.split(" ")[0]||'https://via.placeholder.com/160x100'}"><p>${i.titulo}</p>`;
-      d.onclick=()=>modal.abrir(i);
-      destaquesContainer.appendChild(d);
-    });
-
-    // Setas carrossel
-    const left=document.querySelector(".destaque-left"), right=document.querySelector(".destaque-right");
-    let offset=0;
-    const maxOffset=destaquesContainer.scrollWidth - document.getElementById("destaques-container").clientWidth;
-    left.onclick=()=>{ offset=Math.max(0, offset-180); destaquesContainer.style.transform=`translateX(-${offset}px)`; }
-    right.onclick=()=>{ offset=Math.min(maxOffset, offset+180); destaquesContainer.style.transform=`translateX(-${offset}px)`; }
+    const lista = new ListaImoveis("lista", modal);
+    new FiltroImoveis("filtros-container", dados, lista);
+    new TabsImoveis("tabs-container", dados, lista);
+    new OrdenacaoImoveis("ordenacao-container", lista);
+    new Destaques(dados);
   }
 });
 </script>
