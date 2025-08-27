@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro de Imóveis</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body, html { height: 100%; font-family:'Georgia', serif; background: transparent; color: #333; }
+.wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 40px 20px; width: 100%; }
+form { width: 100%; max-width: 800px; padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.1); border:2px solid #d3b28d; box-shadow:2px 2px 10px rgba(0,0,0,0.1); }
+h2 { text-align:center; margin-bottom:20px; color:#8b5e3c; }
+input, textarea, select { padding:10px; border:1px solid #d3b28d; border-radius:4px; background: rgba(255,248,240,0.7); margin-bottom:10px; flex:1; }
+textarea { resize: vertical; }
+button { width:100%; padding:12px; margin-top:10px; border:none; border-radius:6px; background: #d3b28d; color:#fff; font-size:16px; font-weight:bold; cursor:pointer; }
+button:hover { background:#b48b64; }
+.form-row { display:flex; gap:10px; flex-wrap:wrap; }
+label { display:block; font-size:13px; margin-bottom:4px; color:#8b5e3c; font-weight:bold; }
+.tabs { display:flex; border-bottom:2px solid #d3b28d; margin-bottom:15px; }
+.tab-btn { flex:1; padding:10px; text-align:center; cursor:pointer; background:#f6efe9; border:none; font-weight:bold; }
+.tab-btn.active { background:#d3b28d; color:white; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+#mensagemErro { color:#ff4444; margin-bottom:10px; display:none; }
+@media(max-width:768px){ .form-row { flex-direction:column; } }
+</style>
+</head>
+<body>
+<div class="wrapper">
+<form id="imovelForm">
+<h2>Cadastro de Imóvel</h2>
+
+<!-- Senha de acesso -->
+<div class="form-row" style="position:relative;">
+  <input type="password" name="senha" id="senha" placeholder="Senha de acesso" required style="padding-right:40px;">
+  <span id="toggleSenha" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px; user-select:none;">👁️</span>
+</div>
+
+<div id="mensagemErro"></div>
+
+<!-- Abas -->
+<div class="tabs">
+  <button type="button" class="tab-btn active" data-tab="dados">Dados do Imóvel</button>
+  <button type="button" class="tab-btn" data-tab="contrato">Contrato</button>
+  <button type="button" class="tab-btn" data-tab="financeiro">Financeiro</button>
+  <button type="button" class="tab-btn" data-tab="outros">Outros</button>
+</div>
+
+<!-- Aba 1: Dados do Imóvel -->
+<div id="dados" class="tab-content active">
+  <div class="form-row">
+    <input type="text" name="titulo" placeholder="Título" required>
+    <select name="operacao" required>
+      <option value="" disabled selected>Operação</option>
+      <option>Venda</option><option>Aluguel</option><option>Permuta</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <select name="tipo" required>
+      <option value="" disabled selected>Tipo</option>
+      <option>Apartamento</option><option>Casa</option><option>Sobrado</option>
+      <option>Comercial</option><option>Terreno</option><option>Chácara</option>
+    </select>
+    <input type="text" name="cidade" placeholder="Cidade" required>
+    <input type="text" name="bairro" placeholder="Bairro">
+  </div>
+  <div class="form-row">
+    <input type="number" name="preco" placeholder="Preço (R$)" required>
+    <input type="number" name="area" placeholder="Área (m²)">
+    <input type="number" name="are_total" placeholder="Área Total (m²)">
+  </div>
+  <div class="form-row">
+    <textarea name="descricao" placeholder="Descrição"></textarea>
+  </div>
+  <div class="form-row">
+    <input type="text" name="lat" placeholder="Latitude">
+    <input type="text" name="lng" placeholder="Longitude">
+  </div>
+  <div class="form-row">
+    <input type="text" name="imagens" placeholder="URLs imagens">
+  </div>
+</div>
+
+<!-- Aba 2: Contrato -->
+<div id="contrato" class="tab-content">
+  <div class="form-row">
+    <input type="text" name="locador" placeholder="Locador">
+    <input type="text" name="locatario" placeholder="Locatário">
+  </div>
+  <div class="form-row">
+    <input type="text" name="matricula_imovel" placeholder="Matrícula Imóvel">
+    <input type="text" name="num_iptu" placeholder="Nº IPTU">
+    <input type="text" name="num_contrado" placeholder="Nº Contrato">
+  </div>
+  <div class="form-row">
+    <div style="flex:1">
+      <label for="data_inicio">Data Início</label>
+      <input type="date" name="data_inicio" id="data_inicio">
+    </div>
+    <div style="flex:1">
+      <label for="data_final">Data Final</label>
+      <input type="date" name="data_final" id="data_final">
+    </div>
+  </div>
+  <div class="form-row">
+    <input type="number" name="meses_caucao" placeholder="Meses Caução">
+  </div>
+</div>
+
+<!-- Aba 3: Financeiro -->
+<div id="financeiro" class="tab-content">
+  <div class="form-row">
+    <input type="number" name="condominio" placeholder="Condomínio (R$)">
+    <input type="number" name="iptu" placeholder="IPTU (R$)">
+  </div>
+  <div class="form-row">
+    <div style="flex:1">
+      <label for="data_pag_caucao">Data Pagamento Caução</label>
+      <input type="date" name="data_pag_caucao" id="data_pag_caucao">
+    </div>
+    <div style="flex:1">
+      <label for="valor_recebido">Valor Recebido (R$)</label>
+      <input type="number" step="0.01" name="valor_recebido" id="valor_recebido">
+    </div>
+  </div>
+  <div class="form-row">
+    <select name="forma_receber">
+      <option value="" disabled selected>Forma de Receber</option>
+      <option>Pix</option><option>Transferência</option><option>Boleto</option>
+    </select>
+    <input type="number" step="0.01" name="taxa_administrativa" placeholder="Taxa Administrativa (%)">
+  </div>
+</div>
+
+<!-- Aba 4: Outros -->
+<div id="outros" class="tab-content">
+  <div class="form-row">
+    <select name="cond_incluso">
+      <option value="" disabled selected>Condomínio Incluso?</option>
+      <option>Sim</option><option>Não</option>
+    </select>
+    <select name="aceita_pet">
+      <option value="" disabled selected>Aceita Pet?</option>
+      <option>Sim</option><option>Não</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <div style="flex:1">
+      <label for="data_saida">Data Saída</label>
+      <input type="date" name="data_saida" id="data_saida">
+    </div>
+    <div style="flex:2">
+      <label for="motivo_saida">Motivo Saída</label>
+      <input type="text" name="motivo_saida" id="motivo_saida">
+    </div>
+  </div>
+  <div class="form-row">
+    <input type="tel" name="fone_sindico" placeholder="Telefone Síndico">
+  </div>
+</div>
+
+<button type="submit">Cadastrar Imóvel</button>
+</form>
+</div>
+
+<script>
+// Toggle da senha
+document.getElementById("toggleSenha").addEventListener("click", function(){
+  const senhaInput = document.getElementById("senha");
+  if (senhaInput.type === "password") { senhaInput.type="text"; this.textContent="🙈"; } 
+  else { senhaInput.type="password"; this.textContent="👁️"; }
+});
+
+// Alternância das abas
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+
+// Envio para Google Sheets
+document.getElementById("imovelForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const mensagemErro = document.getElementById("mensagemErro");
+  mensagemErro.style.display="none";
+  const area = parseFloat(this.area.value)||0;
+  const preco = parseFloat(this.preco.value)||0;
+  const preco_m2 = area>0?(preco/area).toFixed(2):0;
+
+  const data = {};
+  new FormData(this).forEach((v,k)=>data[k]=v);
+  data.preco_m2 = preco_m2;
+
+  fetch("https://script.google.com/macros/s/AKfycbwk8ZBoYVWzKKzsG0ncr8YU54MpHi6ibdR1n1NcVFq9BToa7rtoYyFXc4K5as1O0Wn3/exec",{
+    method:"POST", body:JSON.stringify(data)
+  })
+  .then(r=>r.json()).then(res=>{
+    if(res.result==="Erro"){ 
+      mensagemErro.textContent=res.message; mensagemErro.style.display="block";
+    } else {
+      alert("✅ Imóvel cadastrado com sucesso!");
+      this.reset();
+    }
+  }).catch(()=>{ mensagemErro.textContent="Ocorreu um erro ao enviar os dados."; mensagemErro.style.display="block"; });
+});
+</script>
+</body>
+</html>
