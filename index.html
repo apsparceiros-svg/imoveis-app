@@ -150,7 +150,8 @@
           <h2>${imovel.titulo}</h2>
           <p><b>Código:</b> ${imovel.ref||''}</p>
           <p><b>Preço:</b> R$ ${Number(imovel.preco).toLocaleString()} | <b>Cidade:</b> ${imovel.cidade} | <b>Bairro:</b> ${imovel.bairro||''} | <b>Tipo:</b> ${imovel.tipo||''} | <b>Operação:</b> ${imovel.operacao||''}</p>
-          <p><b>Área:</b> ${imovel.area||0}m² | <b>Quartos:</b> ${imovel.quartos||0} | <b>Banheiros:</b> ${imovel.banheiros||0} | <b>Garagem:</b> ${imovel.garagem||0} | <b>Condomínio:</b> ${imovel.condominio||''} | <b>Pet:</b> ${imovel.pet||''}</p>
+          <p><b>Área Const.:</b> ${imovel.area||0}m² | <b>Área Total:</b> ${imovel.area_total||0}m² | <b>Quartos:</b> ${imovel.quartos||0} | <b>Banheiros:</b> ${imovel.banheiros||0} | <b>Garagem:</b> ${imovel.garagem||0}</p>
+          <p><b>Condomínio:</b> ${imovel.condominio||''} | <b>Pet:</b> ${imovel.pet||''}</p>
           <p>${imovel.descricao||''}</p>
           <div style="position:relative; overflow:hidden;">
             <img id="main-img" src="${imgs[0]||'https://via.placeholder.com/400x250'}">
