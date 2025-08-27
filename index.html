@@ -150,8 +150,8 @@
           <h2>${imovel.titulo}</h2>
           <p><b>Código:</b> ${imovel.ref||''}</p>
           <p><b>Preço:</b> R$ ${Number(imovel.preco).toLocaleString()} | <b>Cidade:</b> ${imovel.cidade} | <b>Bairro:</b> ${imovel.bairro||''} | <b>Tipo:</b> ${imovel.tipo||''} | <b>Operação:</b> ${imovel.operacao||''}</p>
-          <p><b>Área Const.:</b> ${imovel.area||0}m² | <b>Área Total:</b> ${imovel.area_total||0}m² | <b>Quartos:</b> ${imovel.quartos||0} | <b>Banheiros:</b> ${imovel.banheiros||0} | <b>Garagem:</b> ${imovel.garagem||0}</p>
-          <p><b>Condomínio:</b> ${imovel.condominio||''} | <b>Pet:</b> ${imovel.pet||''}</p>
+          <p><b>Área Construída:</b> ${imovel.area||0}m² | <b>Área Total:</b> ${imovel.area_total||0}m² | <b>Quartos:</b> ${imovel.quartos||0} | <b>Banheiros:</b> ${imovel.banheiros||0} | <b>Garagem:</b> ${imovel.garagem||0}</p>
+          <p><b>Condomínio Incluso?:</b> ${imovel.condominio||''} | <b>Aceita Pet?:</b> ${imovel.pet||''}</p>
           <p>${imovel.descricao||''}</p>
           <div style="position:relative; overflow:hidden;">
             <img id="main-img" src="${imgs[0]||'https://via.placeholder.com/400x250'}">
@@ -278,7 +278,7 @@
     this.c=document.getElementById(id);this.dados=dados;this.lista=lista;
     const cidades=[...new Set(dados.map(i=>i.cidade))];
     const tipos=[...new Set(dados.map(i=>i.tipo))];
-    this.c.innerHTML=`<input id="busca" placeholder="Tít., desc., bairro ou código">
+    this.c.innerHTML=`<input id="busca" placeholder="Título, descrição, bairro ou código">
       <select id="filtroCidade"><option value="">Cidades</option>${cidades.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
       <select id="filtroTipo"><option value="">Tipos de Imóveis</option>${tipos.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
       <select id="filtroPet"><option value="">Aceita Pet?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
