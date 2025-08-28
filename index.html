@@ -347,36 +347,95 @@
     }
 
     /* ==================== DESTAQUES (carrossel com swipe) ==================== */
-    class Destaques{
-      constructor(imoveis){ this.i = imoveis; this.renderDestaques(); }
-      renderDestaques(){
-        const container = document.getElementById('destaques'); if(!container) return;
-        const cardsHTML = this.i.slice(0,10).map(imovel => `
-          <div class="destaque-card">
-            <img src="${(imovel.imagens||'').split(' ')[0]||'https://via.placeholder.com/200x120'}">
-            <p>${imovel.titulo} - R$ ${Number(imovel.preco).toLocaleString()}</p>
-          </div>
-        `).join('');
-        container.innerHTML = cardsHTML + cardsHTML;
-        const allCards = container.querySelectorAll('.destaque-card');
-        const modal = new ModalImovel('detalhesModal');
-        allCards.forEach((card, idx) => card.onclick = () => modal.abrir(this.i[idx % 10]));
+    class Destaques {
+  constructor(imoveis, palavrasChave = ['destaques', 'premium', 'top']) {
+    // Converte todas as palavras-chave para minúsculo
+    this.palavrasChave = palavrasChave.map(p => p.toLowerCase());
 
-        const cardWidth = container.querySelector('.destaque-card')?.offsetWidth + 12 || 172;
-        const left = document.querySelector('.destaque-left');
-        const right = document.querySelector('.destaque-right');
-        const scrollByCard = amount => { container.scrollBy({ left: amount, behavior: 'smooth' }); setTimeout(()=>{ if(container.scrollLeft >= container.scrollWidth/2) container.scrollLeft -= container.scrollWidth/2; if(container.scrollLeft <= 0) container.scrollLeft += container.scrollWidth/2; },300); };
-        if(left) left.onclick = () => scrollByCard(-cardWidth);
-        if(right) right.onclick = () => scrollByCard(cardWidth);
-        setInterval(()=> scrollByCard(cardWidth), 4000);
+    // Filtra imóveis que contêm pelo menos uma das palavras-chave na descrição
+    this.imoveis = imoveis.filter(i => {
+      if (!i.descricao) return false;
+      const desc = i.descricao.toLowerCase();
+      return this.palavrasChave.some(p => desc.includes(p));
+    });
 
-        // swipe
-        let startX = 0, isDragging = false;
-        container.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; });
-        container.addEventListener('touchmove', e => { if(!isDragging) return; const diff = startX - e.touches[0].clientX; if(Math.abs(diff) > 30){ scrollByCard(diff > 0 ? cardWidth : -cardWidth); startX = e.touches[0].clientX; } });
-        container.addEventListener('touchend', () => { isDragging = false; });
+    if (this.imoveis.length === 0) return; // não renderiza se nenhum destaque
+    this.renderDestaques();
+  }
+
+  renderDestaques() {
+    const container = document.getElementById('destaques');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    // Cria os cards originais
+    this.cards = this.imoveis.map(imovel => {
+      const card = document.createElement('div');
+      card.className = 'destaque-card';
+      card.innerHTML = `
+        <img src="${(imovel.imagens||'').split(' ')[0]||'https://via.placeholder.com/200x120'}">
+        <p>${imovel.titulo} - R$ ${Number(imovel.preco).toLocaleString()}</p>
+      `;
+      container.appendChild(card);
+      return card;
+    });
+
+    // Clona os cards para efeito infinito
+    this.cards.forEach(card => container.appendChild(card.cloneNode(true)));
+
+    const modal = new ModalImovel('detalhesModal');
+    const allCards = container.querySelectorAll('.destaque-card');
+
+    // Clique abre modal do imóvel correto
+    allCards.forEach((card, idx) => {
+      card.onclick = () => modal.abrir(this.imoveis[idx % this.imoveis.length]);
+    });
+
+    const cardWidth = this.cards[0]?.offsetWidth + 12 || 172;
+    let scrollPos = 0;
+    const totalWidth = cardWidth * this.cards.length;
+
+    // Scroll automático infinito
+    const scrollStep = () => {
+      scrollPos += cardWidth;
+      if (scrollPos >= totalWidth / 2) scrollPos = 0; // reinicia ao chegar no clone
+      container.scrollTo({ left: scrollPos, behavior: 'smooth' });
+    };
+    this.interval = setInterval(scrollStep, 4000);
+
+    // Navegação com setas
+    const left = document.querySelector('.destaque-left');
+    const right = document.querySelector('.destaque-right');
+
+    if (left) left.onclick = () => {
+      scrollPos -= cardWidth;
+      if (scrollPos < 0) scrollPos = totalWidth / 2 - cardWidth;
+      container.scrollTo({ left: scrollPos, behavior: 'smooth' });
+    };
+    if (right) right.onclick = () => {
+      scrollPos += cardWidth;
+      if (scrollPos >= totalWidth / 2) scrollPos = 0;
+      container.scrollTo({ left: scrollPos, behavior: 'smooth' });
+    };
+
+    // Swipe touch
+    let startX = 0, isDragging = false;
+    container.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; });
+    container.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      const diff = startX - e.touches[0].clientX;
+      if (Math.abs(diff) > 30) {
+        scrollPos += diff > 0 ? cardWidth : -cardWidth;
+        if (scrollPos >= totalWidth / 2) scrollPos = 0;
+        if (scrollPos < 0) scrollPos = totalWidth / 2 - cardWidth;
+        container.scrollTo({ left: scrollPos, behavior: 'smooth' });
+        startX = e.touches[0].clientX;
       }
-    }
+    });
+    container.addEventListener('touchend', () => { isDragging = false; });
+  }
+}
 
     /* ==================== CARREGAR CSV (mantendo base de dados original) ==================== */
     Papa.parse(csvUrl, { download:true, header:true, complete: res => {
