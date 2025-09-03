@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>App de Imóveis - Corrigido</title>
+  <title>App de Imóveis - Completo</title>
   <style>
     /* ==================== RESET & GERAL ==================== */
     body {
@@ -21,36 +21,19 @@
       width: 100%;
       box-sizing: border-box;
     }
-    #lista {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      margin-bottom: 30px;
-      padding: 0 10px;
-    }
+    #lista { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 30px; padding: 0 10px; }
+    @media(min-width:600px){ #lista{ grid-template-columns:repeat(2,1fr); } }
+    @media(min-width:900px){ #lista{ grid-template-columns:repeat(3,1fr); } }
 
     /* ==================== CARD ==================== */
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      overflow: hidden;
-      background: #fff;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
+    .card { border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.1); overflow: hidden; background: #fff; transition: transform .2s, box-shadow .2s; display:flex; flex-direction:column; position: relative; }
     .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-    .card img { width: 100%; height: 180px; object-fit: cover; }
+    .card img { width: 100%; height: 350px; object-fit: cover; }
     .card-body { padding: 12px; flex: 1; display:flex; flex-direction:column; justify-content:space-between; }
     .card h3 { margin:0; font-size:16px; color:#1a1a1a; }
     .card p { margin:4px 0; color:#555; font-size:13px; }
     .card p.preco { font-weight:bold; color:#2d89ef; font-size:15px; }
-
-    /* detalhes btn - pulsante e aumenta no hover */
-    .btn-detalhes, .modal-content .btn-whatsapp {
-      display:block; margin:10px auto 0 auto; background:#25D366; color:#fff; text-align:center; padding:8px 20px; border-radius:6px; font-weight:bold; text-decoration:none; cursor:pointer; font-size:14px; transition: transform 0.25s ease; animation: pulse 2s infinite;
-    }
+    .btn-detalhes, .modal-content .btn-whatsapp { display:block; margin:10px auto; background:#25D366; color:#fff; text-align:center; padding:8px 20px; border-radius:6px; font-weight:bold; text-decoration:none; cursor:pointer; font-size:14px; transition: transform .25s ease; animation:pulse 2s infinite; }
     .btn-detalhes:hover { transform: scale(1.08); }
     @keyframes pulse { 0%{ transform:scale(1);} 50%{ transform:scale(1.05);} 100%{ transform:scale(1);} }
 
@@ -60,8 +43,7 @@
     .modal-content { background:#fff; padding:15px; border-radius:12px; width:95%; max-width:400px; max-height:90vh; overflow-y:auto; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) scale(.96); box-sizing:border-box; opacity:0; transition: all .35s ease; }
     .modal.show .modal-content { transform:translate(-50%,-50%) scale(1); opacity:1; }
     @media(min-width:900px){ .modal-content{ max-width:800px; max-height:95vh; padding:25px; } }
-
-    .modal-content img { width:100%; max-width:100%; max-height:320px; object-fit:cover; border-radius:8px; margin-bottom:10px; cursor:pointer; transition: transform .3s; }
+    .modal-content img { width:100%; height:auto; max-height:320px; object-fit:contain; background:#f4f4f4; border-radius:8px; margin-bottom:10px; cursor:pointer; transition: transform .3s; }
     .modal-content img.zoomed { transform: scale(2); cursor:move; }
     .modal-content img:hover:not(.zoomed) { transform: scale(1.03); }
     .modal-content .nav-arrow { position:absolute; top:50%; transform: translateY(-50%); font-size:22px; color:#fff; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:50%; cursor:pointer; user-select:none; z-index:5; }
@@ -80,25 +62,149 @@
     /* ==================== CARROSSEL ==================== */
     #destaques-container{ position:relative; margin-top:15px; }
     #destaques{ display:flex; gap:12px; overflow-x:auto; scroll-behavior:smooth; padding:0 40px; }
-    #destaques .destaque-card{ min-width:160px; flex:0 0 auto; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.1); cursor:pointer; transition:transform .2s, box-shadow .2s; }
+    #destaques .destaque-card{ min-width:160px; flex:0 0 auto; border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,0.1); cursor:pointer; transition:transform .2s, box-shadow .2s; text-align:center; }
     #destaques .destaque-card:hover{ transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,0.2); }
-    #destaques .destaque-card img{ width:100%; height:100px; object-fit:cover; }
-    #destaques .destaque-card p{ padding:6px; margin:0; font-size:12px; font-weight:bold; color:#2d89ef; text-align:center; }
+    #destaques .destaque-card img{ width:100%; height:auto; max-height:250px; object-fit:contain; background:#f4f4f4; }
+    #destaques .destaque-card p{ padding:6px; margin:0; font-size:12px; font-weight:bold; color:#2d89ef; }
     #destaques-container .destaque-left, #destaques-container .destaque-right{ position:absolute; top:50%; transform:translateY(-50%); font-size:28px; color:#fff; background:rgba(0,0,0,0.4); padding:6px 12px; border-radius:50%; cursor:pointer; z-index:10; }
     #destaques-container .destaque-left{ left:5px; } #destaques-container .destaque-right{ right:5px; }
 
-    /* ==================== WHATSAPP FLUTUANTE ==================== */
-    #whatsapp-flutuante{ position:fixed; bottom:15px; right:15px; width:60px; height:60px; z-index:9999; cursor:pointer; animation:pulse 2s infinite; }
-    #whatsapp-flutuante img{ width:100%; height:100%; border-radius:50%; }
+    /* ==================== WHATSAPP FIXO ==================== */
+    #whatsapp-flutuante {
+      position: fixed;        
+      top: 20px;              
+      right: 20px;
+      width: 55px;
+      height: 55px;
+      z-index: 1000;
+      cursor: pointer;
+      animation: pulse 2s infinite;
+      transition: transform 0.3s ease;
+    }
+    #whatsapp-flutuante:hover { transform: scale(1.1); }
+    #whatsapp-flutuante img { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
+
+/* ==================== CALENDÁRIO TRADICIONAL ==================== */
+.calendario-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.calendario-dia {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.calendario-dia.cabecalho {
+  font-weight: bold;
+  background: #f1f1f1;
+}
+
+.calendario-dia.vazio {
+  background: transparent;
+  border: none;
+}
+
+.calendario-dia.dia-reservado {
+  background: #f8d7da;
+  color: #721c24;
+  cursor: not-allowed;
+}
+
+.calendario-dia.dia-disponivel {
+  background: #d4edda;
+  color: #155724;
+  cursor: pointer;
+}
+
+.calendario-dia.dia-selecionado {
+  background: #007bff;
+  color: white;
+}
+
+/* Meses */
+.calendario-mes {
+  margin-bottom: 20px;
+}
+
+.calendario-mes h4 {
+  text-align: center;
+  margin: 5px 0;
+}
+
+/* Botão de disponibilidade */
+.btn-ver-disponibilidade { 
+  display: block;
+  margin: 10px auto;
+  background: #25D366;
+  color: #fff; 
+  text-align: center;
+  padding: 8px 20px;
+  border-radius: 6px; 
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer; 
+  font-size: 14px; 
+  transition: transform .25s ease;
+  animation: pulse 2s infinite;
+}
+
+.btn-ver-disponibilidade:hover { 
+  transform: scale(1.08); 
+}
+
+/* Abas dos meses */
+#calendario-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 6px 0;
+}
+
+.tab {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab.active {
+  background: #007bff;
+  color: white;
+}
+
+/* Botões de navegação dos meses */
+#mes-prev, #mes-next {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#mes-prev:hover, #mes-next:hover {
+  background: #0056b3;
+}
+
+/* Responsivo celular */
+@media(max-width:480px){
+  .calendario-dia { font-size: 10px; padding: 4px 0; }
+  .tab { padding: 4px 8px; font-size: 12px; }
+  #mes-prev, #mes-next { padding: 4px 8px; font-size: 12px; }
+}
 
     /* ==================== RESPONSIVO ==================== */
-    @media(min-width:600px){ #lista{ grid-template-columns:repeat(2,1fr); gap:16px; padding:0 20px; } }
-    @media(min-width:900px){ #lista{ grid-template-columns:repeat(3,1fr); gap:20px; padding:0 30px; } }
     @media(max-width:480px){ .modal-content .nav-arrow, .card h3{ font-size:14px; } .card p, .card p.preco{ font-size:12px; } }
   </style>
 </head>
 <body>
-
   <!-- Destaques -->
   <div id="destaques-container">
     <span class="nav-arrow destaque-left">&#10094;</span>
@@ -122,23 +228,31 @@
     </div>
   </div>
 
-  <!-- WhatsApp fixo -->
+  <!-- Modal de Calendário -->
+<div id="calendarioModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <div id="calendario-body"></div>
+  </div>
+</div>
+
+  <!-- WhatsApp fixo no topo direito -->
   <a id="whatsapp-flutuante" href="https://api.whatsapp.com/send?phone=5512992468636" target="_blank" aria-label="WhatsApp">
     <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" />
   </a>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
-    // ==================== CONFIG ====================
     const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-T1jc4Rpdigxqpkf7cL0MYiA8IESg1ATBwVdT7gTTPaMll_LGuwj0zOfbeEIO8Qv3DOZsK6eNBrZ/pub?gid=11391417&single=true&output=csv";
     const whatsappNumber = "5512992468636";
 
-    /* ==================== MODAL (zoom + miniaturas) ==================== */
+    /* ==================== MODAL COMPLETO COM OVERLAY ==================== */
     class ModalImovel {
       constructor(id){
         this.modal = document.getElementById(id);
         this.body = this.modal.querySelector('#modal-body');
         this.close = this.modal.querySelector('.close');
+        this.autoPlayInterval = null;
         this.close.onclick = () => this.fechar();
         window.addEventListener('keydown', e => { if(e.key === 'Escape') this.fechar(); });
         window.onclick = e => { if(e.target == this.modal) this.fechar(); };
@@ -146,12 +260,13 @@
       abrir(imovel){
         const imgs = (imovel.imagens||'').split(' ').filter(i => i);
         let idxImg = 0;
+
         this.body.innerHTML = `
           <h2>${imovel.titulo}</h2>
           <p><b>Código:</b> ${imovel.ref||''}</p>
           <p><b>Preço:</b> R$ ${Number(imovel.preco).toLocaleString()} | <b>Cidade:</b> ${imovel.cidade} | <b>Bairro:</b> ${imovel.bairro||''} | <b>Tipo:</b> ${imovel.tipo||''} | <b>Operação:</b> ${imovel.operacao||''}</p>
           <p><b>Área Construída:</b> ${imovel.area||0}m² | <b>Área Total:</b> ${imovel.area_total||0}m² | <b>Quartos:</b> ${imovel.quartos||0} | <b>Banheiros:</b> ${imovel.banheiros||0} | <b>Garagem:</b> ${imovel.garagem||0}</p>
-          <p><b>Condomínio Incluso?:</b> ${imovel.condominio||''} | <b>Aceita Pet?:</b> ${imovel.pet||''}</p>
+          <p><b>IPTU:</b> R$ ${Number(imovel.iptu).toLocaleString()} | <b>Condomínio:</b> R$ ${Number(imovel.condominio).toLocaleString()} | <b>Condomínio Incluso?:</b> ${imovel.cond_incluso||''} | <b>Aceita Pet?:</b> ${imovel.aceita_pet||''}</p>
           <p>${imovel.descricao||''}</p>
           <div style="position:relative; overflow:hidden;">
             <img id="main-img" src="${imgs[0]||'https://via.placeholder.com/400x250'}">
@@ -166,299 +281,291 @@
         const mini = this.body.querySelectorAll('.miniaturas img');
         const left = this.body.querySelector('.nav-left');
         const right = this.body.querySelector('.nav-right');
+        let isZoomed=false, startX=0, startY=0, translateX=0, translateY=0, dragging=false;
 
-        const update = i => { idxImg = i; main.src = imgs[i] || 'https://via.placeholder.com/400x250'; mini.forEach((m,j)=>m.classList.toggle('selected', i===j)); resetZoom(); };
-        mini.forEach((m,i)=> m.onclick = () => update(i));
-        left.onclick = () => update((idxImg-1+imgs.length)%imgs.length);
-        right.onclick = () => update((idxImg+1)%imgs.length);
+        main.style.transition='transform 0.3s ease'; main.style.cursor='zoom-in';
 
-        // Zoom & pan
-        let isZoomed = false, startX = 0, startY = 0, translateX = 0, translateY = 0, dragging = false;
-        main.style.transition = 'transform 0.3s ease';
-        main.style.cursor = 'zoom-in';
-        const toggleZoom = (clientX, clientY) => {
-          isZoomed = !isZoomed;
-          main.classList.toggle('zoomed', isZoomed);
-          main.style.cursor = isZoomed ? 'move' : 'zoom-in';
-          if(isZoomed){
-            document.body.style.overflow = 'hidden';
-            const rect = main.getBoundingClientRect();
-            const originX = ((clientX - rect.left) / main.clientWidth) * 100;
-            const originY = ((clientY - rect.top) / main.clientHeight) * 100;
-            main.style.transformOrigin = `${originX}% ${originY}%`;
-            translateX = 0; translateY = 0;
-            main.style.transform = `scale(2) translate(0px,0px)`;
-          } else {
-            document.body.style.overflow = '';
-            main.style.transform = 'scale(1) translate(0px,0px)';
-            translateX = 0; translateY = 0;
-          }
+        const update = i => { idxImg=(i+imgs.length)%imgs.length; main.src=imgs[idxImg]; mini.forEach((m,j)=>m.classList.toggle('selected', idxImg===j)); resetZoom(); };
+        const iniciarAutoplay = () => { clearInterval(this.autoPlayInterval); this.autoPlayInterval = setInterval(()=>update(idxImg+1),4000); };
+        iniciarAutoplay();
+
+        left.onclick = ()=>{ update(idxImg-1); clearInterval(this.autoPlayInterval); };
+        right.onclick = ()=>{ update(idxImg+1); clearInterval(this.autoPlayInterval); };
+
+        const resetZoom=()=>{ isZoomed=false; main.classList.remove('zoomed'); main.style.cursor='zoom-in'; main.style.transform='scale(1) translate(0,0)'; translateX=0; translateY=0; document.body.style.overflow=''; };
+
+        const abrirOverlay = (initialIdx) => {
+          clearInterval(this.autoPlayInterval);
+          let idx = initialIdx;
+          const overlay = document.createElement('div');
+          overlay.style.position='fixed'; overlay.style.top=0; overlay.style.left=0; overlay.style.width='100%'; overlay.style.height='100%'; overlay.style.background='rgba(0,0,0,0.9)'; overlay.style.display='flex'; overlay.style.flexDirection='column'; overlay.style.alignItems='center'; overlay.style.justifyContent='center'; overlay.style.zIndex=10000; overlay.style.padding='20px'; overlay.style.boxSizing='border-box'; overlay.style.overflow='auto';
+
+          const imgContainer = document.createElement('div');
+          imgContainer.style.position='relative'; imgContainer.style.display='flex'; imgContainer.style.alignItems='center'; imgContainer.style.justifyContent='center';
+          overlay.appendChild(imgContainer);
+
+          const imgOverlay = document.createElement('img');
+          imgOverlay.src = imgs[idx];
+          imgOverlay.style.maxWidth='90%'; imgOverlay.style.maxHeight='70%'; imgOverlay.style.cursor='zoom-in'; imgOverlay.style.transition='transform 0.3s ease';
+          imgContainer.appendChild(imgOverlay);
+
+          const setaEsq = document.createElement('span');
+          setaEsq.innerHTML='&#10094;'; setaEsq.style.cssText='position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:36px;color:#fff;cursor:pointer;user-select:none;z-index:5;';
+          const setaDir = document.createElement('span');
+          setaDir.innerHTML='&#10095;'; setaDir.style.cssText='position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:36px;color:#fff;cursor:pointer;user-select:none;z-index:5;';
+          imgContainer.appendChild(setaEsq); imgContainer.appendChild(setaDir);
+
+          const atualizarOverlay = (novoIdx)=>{ idx=(novoIdx+imgs.length)%imgs.length; imgOverlay.src=imgs[idx]; Array.from(miniContainer.children).forEach((m,i)=>m.style.border=i===idx?'2px solid #2d89ef':'2px solid transparent'); resetZoomOverlay(); };
+          setaEsq.onclick = ()=>atualizarOverlay(idx-1); setaDir.onclick = ()=>atualizarOverlay(idx+1);
+
+          const miniContainer = document.createElement('div'); miniContainer.style.cssText='display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;';
+          imgs.forEach((src,i)=>{ const m=document.createElement('img'); m.src=src; m.style.width='50px'; m.style.height='50px'; m.style.objectFit='cover'; m.style.borderRadius='6px'; m.style.cursor='pointer'; m.style.border=i===idx?'2px solid #2d89ef':'2px solid transparent'; m.onclick=()=>atualizarOverlay(i); miniContainer.appendChild(m); });
+          overlay.appendChild(miniContainer);
+
+          let zoom=false, tx=0, ty=0, dragging=false, startX=0, startY=0;
+          const toggleZoomOverlay=()=>{ zoom=!zoom; imgOverlay.style.transform=zoom?`scale(2) translate(${tx}px,${ty}px)`:'scale(1)'; imgOverlay.style.cursor=zoom?'move':'zoom-in'; if(!zoom){ tx=0; ty=0; } };
+          imgOverlay.onclick=()=>{ if(!zoom){ toggleZoomOverlay(); } };
+          imgOverlay.addEventListener('mousedown', e=>{ if(zoom){ dragging=true; startX=e.clientX-tx; startY=e.clientY-ty; imgOverlay.style.cursor='grabbing'; }});
+          window.addEventListener('mousemove', e=>{ if(dragging){ tx=e.clientX-startX; ty=e.clientY-startY; imgOverlay.style.transform=`scale(2) translate(${tx}px,${ty}px)`; }});
+          window.addEventListener('mouseup', ()=>{ dragging=false; if(zoom) imgOverlay.style.cursor='move'; });
+
+          overlay.addEventListener('click', e=>{ if(e.target===overlay){ document.body.removeChild(overlay); iniciarAutoplay(); }});
+          window.addEventListener('keydown', function escHandler(e){ if(e.key==='Escape' && document.body.contains(overlay)){ document.body.removeChild(overlay); iniciarAutoplay(); window.removeEventListener('keydown', escHandler); }});
+
+          document.body.appendChild(overlay);
+          const resetZoomOverlay=()=>{ zoom=false; tx=0; ty=0; imgOverlay.style.transform='scale(1) translate(0,0)'; imgOverlay.style.cursor='zoom-in'; };
         };
-        const resetZoom = () => { isZoomed = false; main.classList.remove('zoomed'); main.style.cursor = 'zoom-in'; main.style.transform = 'scale(1) translate(0px,0px)'; translateX = 0; translateY = 0; document.body.style.overflow = ''; };
 
-        main.addEventListener('click', e => { toggleZoom(e.clientX, e.clientY); });
+        mini.forEach((m,i)=> m.onclick = () => abrirOverlay(i));
 
-        const limitTranslate = () => {
-          if(!isZoomed) return;
-          const rect = main.getBoundingClientRect();
-          const parent = main.parentElement.getBoundingClientRect();
-          const maxX = (rect.width - parent.width)/2;
-          const maxY = (rect.height - parent.height)/2;
-          translateX = Math.min(Math.max(translateX, -maxX), maxX);
-          translateY = Math.min(Math.max(translateY, -maxY), maxY);
-        };
+        main.addEventListener('click', e=>{ if(!isZoomed) abrirOverlay(idxImg); });
 
-        main.addEventListener('mousedown', e => { if(isZoomed){ dragging = true; startX = e.clientX - translateX; startY = e.clientY - translateY; main.style.cursor = 'grabbing'; }});
-        window.addEventListener('mousemove', e => { if(dragging){ translateX = e.clientX - startX; translateY = e.clientY - startY; limitTranslate(); main.style.transform = `scale(2) translate(${translateX}px,${translateY}px)`; }});
-        window.addEventListener('mouseup', e => { if(dragging){ dragging = false; main.style.cursor = 'move'; }});
-
-        main.addEventListener('touchstart', e => { if(e.touches.length === 1 && isZoomed){ startX = e.touches[0].clientX - translateX; startY = e.touches[0].clientY - translateY; }} , { passive:false });
-        main.addEventListener('touchmove', e => { if(e.touches.length === 1 && isZoomed){ e.preventDefault(); translateX = e.touches[0].clientX - startX; translateY = e.touches[0].clientY - startY; limitTranslate(); main.style.transform = `scale(2) translate(${translateX}px,${translateY}px)`; }} , { passive:false });
-
-        // open modal
         this.modal.classList.add('show');
       }
       fechar(){
         this.modal.classList.remove('show');
-        // keep display none handled by CSS (display:block when .show exists). No extra timeout needed.
-        // But to ensure elements not stuck with overflow hidden
         document.body.style.overflow = '';
       }
     }
 
-    /* ==================== LISTA ==================== */
-    class ListaImoveis{
-      constructor(id, modal){ this.lista = document.getElementById(id); this.modal = modal; this.filteredData = []; }
-      render(dados, filtro = {}, tab = ""){
-        // dados: array to render (full or already filtered/sorted). We'll apply additional filtro/tab if provided.
-        const source = Array.isArray(dados) ? dados : [];
-        this.lista.innerHTML = '';
-        this.filteredData = source.filter(i => {
-          const p = Number(i.preco || 0);
-          if(tab && i.operacao !== tab) return false;
-          if(filtro.busca && !(`${i.titulo} ${i.descricao} ${i.bairro || ''} ${i.ref || ''}`.toLowerCase().includes(filtro.busca.toLowerCase()))) return false;
-          if(filtro.cidade && i.cidade !== filtro.cidade) return false;
-          if(filtro.tipo && i.tipo !== filtro.tipo) return false;
-          if(filtro.pet && i.pet !== filtro.pet) return false;
-          if(filtro.condominio && i.condominio !== filtro.condominio) return false;
-          if(filtro.precoMin && p < Number(filtro.precoMin)) return false;
-          if(filtro.precoMax && p > Number(filtro.precoMax)) return false;
-          return true;
-        });
+    /* ==================== RESTO DO SITE: LISTA, FILTRO, TABS, ORDENACAO, DESTAQUES ==================== */
+    class ListaImoveis{ constructor(id, modal){ this.lista = document.getElementById(id); this.modal = modal; this.filteredData = []; } render(dados,filtro={},tab=""){ const source=Array.isArray(dados)?dados:[]; this.lista.innerHTML=''; this.filteredData=source.filter(i=>{ const p=Number(i.preco||0); if(tab && i.operacao!==tab) return false; if(filtro.busca && !(`${i.titulo} ${i.descricao} ${i.bairro||''} ${i.ref||''}`.toLowerCase().includes(filtro.busca.toLowerCase())) ) return false; if(filtro.cidade && i.cidade!==filtro.cidade) return false; if(filtro.tipo && i.tipo!==filtro.tipo) return false; if(filtro.aceita_pet && i.aceita_pet!==filtro.aceita_pet) return false; if(filtro.cond_incluso && i.cond_incluso!==filtro.cond_incluso) return false; if(filtro.precoMin && p<Number(filtro.precoMin)) return false; if(filtro.precoMax && p>Number(filtro.precoMax)) return false; return true; }); this.filteredData.forEach(i=>{ const c=document.createElement('div'); c.className='card'; const imgs=(i.imagens||'').split(' ').filter(s=>s); c.innerHTML=`<img src="${imgs[0]||'https://via.placeholder.com/400x250'}"><div class="card-body"><h3>${i.titulo||''}</h3><p class="preco">R$ ${Number(i.preco||0).toLocaleString()}</p><p>${i.cidade||''} | ${i.tipo||''}</p><button class="btn-detalhes">Detalhes</button></div>`; c.querySelector('.btn-detalhes').onclick=()=>this.modal.abrir(i); if(imgs.length>1){ let idx=0; setInterval(()=>{ idx=(idx+1)%imgs.length; const elImg=c.querySelector('img'); if(elImg) elImg.src=imgs[idx]; },3000);} this.lista.appendChild(c); });} }
 
-        this.filteredData.forEach(i => {
-          const c = document.createElement('div'); c.className = 'card';
-          const imgs = (i.imagens||'').split(' ').filter(s => s);
-          c.innerHTML = `
-            <img src="${imgs[0]||'https://via.placeholder.com/400x250'}">
-            <div class="card-body">
-              <h3>${i.titulo||''}</h3>
-              <p class="preco">R$ ${Number(i.preco||0).toLocaleString()}</p>
-              <p>${i.cidade||''} | ${i.tipo||''}</p>
-              <button class="btn-detalhes">Detalhes</button>
-            </div>
-          `;
+    class FiltroImoveis{ constructor(id,dados,lista){ this.c=document.getElementById(id);this.dados=dados;this.lista=lista; const cidades=[...new Set(dados.map(i=>i.cidade))]; const tipos=[...new Set(dados.map(i=>i.tipo))]; this.c.innerHTML=`<input id="busca" placeholder="Título, descrição, bairro ou código"><select id="filtroCidade"><option value="">Cidades</option>${cidades.map(c=>`<option value="${c}">${c}</option>`).join('')}</select><select id="filtroTipo"><option value="">Tipos de Imóveis</option>${tipos.map(t=>`<option value="${t}">${t}</option>`).join('')}</select><select id="filtroPet"><option value="">Aceita Pet?</option><option value="Sim">Sim</option><option value="Não">Não</option></select><select id="filtroCondo"><option value="">Condomínio Incluso?</option><option value="Sim">Sim</option><option value="Não">Não</option></select><input id="filtroPrecoMin" type="number" placeholder="Preço mínimo"><input id="filtroPrecoMax" type="number" placeholder="Preço máximo">`; const update=()=>{ const f={ busca:this.c.querySelector("#busca").value, cidade:this.c.querySelector("#filtroCidade").value, tipo:this.c.querySelector("#filtroTipo").value, aceita_pet:this.c.querySelector("#filtroPet").value, cond_incluso:this.c.querySelector("#filtroCondo").value, precoMin:this.c.querySelector("#filtroPrecoMin").value, precoMax:this.c.querySelector("#filtroPrecoMax").value }; const tab=document.querySelector(".tab.active")?.dataset.tab||""; this.lista.render(this.dados,f,tab); }; ["busca","filtroCidade","filtroTipo","filtroPet","filtroCondo","filtroPrecoMin","filtroPrecoMax"].forEach(id=>{ const el=this.c.querySelector("#"+id); el.tagName==="INPUT"?el.addEventListener("input",update):el.addEventListener("change",update); }); update(); } }
 
-          c.querySelector('.btn-detalhes').onclick = () => this.modal.abrir(i);
+    class TabsImoveis{ constructor(id,dados,lista){ this.c=document.getElementById(id); this.dados=dados; this.lista=lista; this.init(); } init(){ const tabs=[...new Set(this.dados.map(i=>i.operacao))]; tabs.unshift('Todos'); this.c.innerHTML=''; tabs.forEach(tab=>{ const t=document.createElement('span'); t.className='tab'; t.dataset.tab=(tab==='Todos'?'':tab); t.textContent=tab.charAt(0).toUpperCase()+tab.slice(1).toLowerCase(); t.onclick=()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const f={}; this.lista.render(this.dados,f,t.dataset.tab); }; this.c.appendChild(t); }); this.c.querySelector('.tab').classList.add('active'); } }
 
-          // slideshow automático quando mais de uma imagem
-          if(imgs.length > 1){
-            let idx = 0;
-            setInterval(() => { idx = (idx+1) % imgs.length; const elImg = c.querySelector('img'); if(elImg) elImg.src = imgs[idx]; }, 3000);
-          }
+    class OrdenacaoImoveis{ constructor(id,lista){ this.c=document.getElementById(id); this.lista=lista; this.init(); } init(){ this.c.innerHTML=`<select class="ordenacao-select" id="ordenar"><option value="">Ordenar por</option><option value="preco_asc">Preço Crescente</option><option value="preco_desc">Preço Decrescente</option><option value="area_asc">Área Crescente</option><option value="area_desc">Área Decrescente</option></select>`; this.c.querySelector('#ordenar').addEventListener('change',e=>{ const val=e.target.value; const data=this.lista.filteredData.slice(); if(val==='preco_asc') data.sort((a,b)=>Number(a.preco)-Number(b.preco)); if(val==='preco_desc') data.sort((a,b)=>Number(b.preco)-Number(a.preco)); if(val==='area_asc') data.sort((a,b)=>Number(a.area)-Number(b.area)); if(val==='area_desc') data.sort((a,b)=>Number(b.area)-Number(a.area)); this.lista.render(data); }); } }
 
-          this.lista.appendChild(c);
-        });
-      }
-    }
+    class Destaques { constructor(imoveis,palavrasChave=['destaques','premium','top']){ this.palavrasChave=palavrasChave.map(p=>p.toLowerCase()); this.imoveis=imoveis.filter(i=>i.descricao && this.palavrasChave.some(p=>i.descricao.toLowerCase().includes(p))); if(this.imoveis.length===0) return; this.renderDestaques(); } renderDestaques(){ const container=document.getElementById('destaques'); container.innerHTML=''; this.cards=this.imoveis.map(i=>{ const card=document.createElement('div'); card.className='destaque-card'; card.innerHTML=`<img src="${(i.imagens||'').split(' ')[0]||'https://via.placeholder.com/200x120'}"><p>${i.titulo} - R$ ${Number(i.preco).toLocaleString()}</p>`; container.appendChild(card); return card; }); this.cards.forEach(c=>container.appendChild(c.cloneNode(true))); const modal=new ModalImovel('detalhesModal'); container.querySelectorAll('.destaque-card').forEach((c,idx)=>c.onclick=()=>modal.abrir(this.imoveis[idx%this.imoveis.length])); const w=this.cards[0]?.offsetWidth+12||172; let pos=0; const total=w*this.cards.length; const step=()=>{ pos+=w; if(pos>=total/2) pos=0; container.scrollTo({left:pos,behavior:'smooth'}); }; setInterval(step,4000); document.querySelector('.destaque-left').onclick=()=>{ pos-=w; if(pos<0) pos=total/2-w; container.scrollTo({left:pos,behavior:'smooth'}); }; document.querySelector('.destaque-right').onclick=()=>{ pos+=w; if(pos>=total/2) pos=0; container.scrollTo({left:pos,behavior:'smooth'}); }; let startX=0,isDrag=false; container.addEventListener('touchstart',e=>{ startX=e.touches[0].clientX; isDrag=true; }); container.addEventListener('touchmove',e=>{ if(!isDrag) return; const diff=startX-e.touches[0].clientX; if(Math.abs(diff)>30){ pos+=diff>0?w:-w; if(pos>=total/2) pos=0; if(pos<0) pos=total/2-w; container.scrollTo({left:pos,behavior:'smooth'}); startX=e.touches[0].clientX; } }); container.addEventListener('touchend',()=>{ isDrag=false; }); } }
 
-    /* ==================== FILTROS ==================== */
-    class FiltroImoveis{
-  constructor(id,dados,lista){
-    this.c=document.getElementById(id);this.dados=dados;this.lista=lista;
-    const cidades=[...new Set(dados.map(i=>i.cidade))];
-    const tipos=[...new Set(dados.map(i=>i.tipo))];
-    this.c.innerHTML=`<input id="busca" placeholder="Título, descrição, bairro ou código">
-      <select id="filtroCidade"><option value="">Cidades</option>${cidades.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
-      <select id="filtroTipo"><option value="">Tipos de Imóveis</option>${tipos.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
-      <select id="filtroPet"><option value="">Aceita Pet?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
-      <select id="filtroCondo"><option value="">Condomínio Incluso?</option><option value="Sim">Sim</option><option value="Não">Não</option></select>
-      <input id="filtroPrecoMin" type="number" placeholder="Preço mínimo">
-      <input id="filtroPrecoMax" type="number" placeholder="Preço máximo">`;
-    const update=()=>{
-      const f={
-        busca:this.c.querySelector("#busca").value,
-        cidade:this.c.querySelector("#filtroCidade").value,
-        tipo:this.c.querySelector("#filtroTipo").value,
-        pet:this.c.querySelector("#filtroPet").value,
-        condominio:this.c.querySelector("#filtroCondo").value,
-        precoMin:this.c.querySelector("#filtroPrecoMin").value,
-        precoMax:this.c.querySelector("#filtroPrecoMax").value
-      };
-      const tab=document.querySelector(".tab.active")?.dataset.tab||"";
-      this.lista.render(this.dados,f,tab);
-    }
-    ["busca","filtroCidade","filtroTipo","filtroPet","filtroCondo","filtroPrecoMin","filtroPrecoMax"].forEach(id=>{
-      const el=this.c.querySelector("#"+id);
-      el.tagName==="INPUT"?el.addEventListener("input",update):el.addEventListener("change",update);
-    });
-    update();
+    class ModalCalendario {
+  constructor(id){
+    this.modal = document.getElementById(id);
+    this.body = this.modal.querySelector('#calendario-body');
+    this.close = this.modal.querySelector('.close');
+    this.close.onclick = () => this.fechar();
+    window.addEventListener('keydown', e => { if(e.key === 'Escape') this.fechar(); });
+    window.onclick = e => { if(e.target == this.modal) this.fechar(); };
+  }
+  abrir(conteudoCallback){
+    this.body.innerHTML = ''; // limpa antes
+    conteudoCallback(this.body); // renderiza calendário
+    this.modal.classList.add('show');
+  }
+  fechar(){
+    this.modal.classList.remove('show');
   }
 }
 
-    /* ==================== TABS ==================== */
-    class TabsImoveis{
-      constructor(id, dados, lista){ this.c = document.getElementById(id); this.dados = dados; this.lista = lista; this.init(); }
-      init(){
-        const tabs = [...new Set(this.dados.map(i => i.operacao))]; tabs.unshift('Todos');
-        this.c.innerHTML = '';
-        tabs.forEach(tab => {
-          const t = document.createElement('span'); t.className = 'tab'; t.dataset.tab = (tab === 'Todos' ? '' : tab); t.textContent = tab.charAt(0).toUpperCase() + tab.slice(1).toLowerCase();
-          t.onclick = () => { document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const f = {}; this.lista.render(this.dados, f, t.dataset.tab); };
-          this.c.appendChild(t);
-        });
-        this.c.querySelector('.tab').classList.add('active');
+// ================= CALENDARIO DE RESERVAS =================
+function gerarCalendarioReservas(imoveis){
+  const nomesMeses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho',
+                     'Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+  function parseDataBR(str){
+    if(!str) return null;
+    const parts=str.split(/[\/\-]/);
+    if(parts.length===3){
+      if(parts[0].length===4){ // yyyy-mm-dd
+        return new Date(parts[0],parts[1]-1,parts[2]);
+      } else { // dd/mm/yyyy
+        return new Date(parts[2],parts[1]-1,parts[0]);
       }
     }
+    return null;
+  }
 
-    /* ==================== ORDENAÇÃO ==================== */
-    class OrdenacaoImoveis{
-      constructor(id, lista){ this.c = document.getElementById(id); this.lista = lista; this.init(); }
-      init(){
-        this.c.innerHTML = `
-          <select class="ordenacao-select" id="ordenar">
-            <option value="">Ordenar por</option>
-            <option value="preco_asc">Preço Crescente</option>
-            <option value="preco_desc">Preço Decrescente</option>
-            <option value="area_asc">Área Crescente</option>
-            <option value="area_desc">Área Decrescente</option>
-          </select>
-        `;
-        this.c.querySelector('#ordenar').addEventListener('change', e => {
-          const val = e.target.value;
-          const data = this.lista.filteredData.slice();
-          if(val === 'preco_asc') data.sort((a,b) => Number(a.preco) - Number(b.preco));
-          if(val === 'preco_desc') data.sort((a,b) => Number(b.preco) - Number(a.preco));
-          if(val === 'area_asc') data.sort((a,b) => Number(a.area) - Number(b.area));
-          if(val === 'area_desc') data.sort((a,b) => Number(b.area) - Number(a.area));
-          this.lista.render(data);
-        });
-      }
+  return function(modalBody, enderecoSelecionado, tituloImovel){
+    modalBody.innerHTML = `
+      <div id="calendario-header" style="display:flex;align-items:center;gap:8px;overflow:hidden;">
+        <button id="mes-prev" style="flex:0 0 auto;">&#10094;</button>
+        <div id="calendario-tabs" style="display:flex;gap:6px;overflow-x:auto;flex:1;"></div>
+        <button id="mes-next" style="flex:0 0 auto;">&#10095;</button>
+      </div>
+      <div id="calendario-geral"></div>
+    `;
+
+    const tabsContainer=document.getElementById('calendario-tabs');
+    const container=document.getElementById('calendario-geral');
+    const btnPrev=document.getElementById('mes-prev');
+    const btnNext=document.getElementById('mes-next');
+
+    const reservas=[];
+    imoveis.filter(i=>i.endereco===enderecoSelecionado).forEach(i=>{
+      const inicio=parseDataBR(i.data_inicio);
+      const fim=parseDataBR(i.data_final);
+      if(inicio && fim){ reservas.push({inicio,fim}); }
+    });
+
+    const hoje=new Date();
+    let mesAtual = hoje.getMonth();
+    let anoAtual = hoje.getFullYear();
+
+    const mesesParaExibir=[];
+    for(let i=0;i<12;i++){
+      const m=(mesAtual+i)%12;
+      const a=anoAtual+Math.floor((mesAtual+i)/12);
+      mesesParaExibir.push({mes:m, ano:a, nome:nomesMeses[m] + ' ' + a});
     }
 
-    /* ==================== DESTAQUES (carrossel com swipe) ==================== */
-    class Destaques {
-  constructor(imoveis, palavrasChave = ['destaques', 'premium', 'top']) {
-    // Converte todas as palavras-chave para minúsculo
-    this.palavrasChave = palavrasChave.map(p => p.toLowerCase());
-
-    // Filtra imóveis que contêm pelo menos uma das palavras-chave na descrição
-    this.imoveis = imoveis.filter(i => {
-      if (!i.descricao) return false;
-      const desc = i.descricao.toLowerCase();
-      return this.palavrasChave.some(p => desc.includes(p));
+    mesesParaExibir.forEach((mObj, idx)=>{
+      const tab=document.createElement('span');
+      tab.className='tab';
+      tab.textContent=mObj.nome;
+      tab.dataset.mes=mObj.mes;
+      tab.dataset.ano=mObj.ano;
+      tab.onclick=()=>selecionarMes(idx);
+      tabsContainer.appendChild(tab);
     });
 
-    if (this.imoveis.length === 0) return; // não renderiza se nenhum destaque
-    this.renderDestaques();
-  }
+    let indiceSelecionado=0;
 
-  renderDestaques() {
-    const container = document.getElementById('destaques');
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    // Cria os cards originais
-    this.cards = this.imoveis.map(imovel => {
-      const card = document.createElement('div');
-      card.className = 'destaque-card';
-      card.innerHTML = `
-        <img src="${(imovel.imagens||'').split(' ')[0]||'https://via.placeholder.com/200x120'}">
-        <p>${imovel.titulo} - R$ ${Number(imovel.preco).toLocaleString()}</p>
-      `;
-      container.appendChild(card);
-      return card;
-    });
-
-    // Clona os cards para efeito infinito
-    this.cards.forEach(card => container.appendChild(card.cloneNode(true)));
-
-    const modal = new ModalImovel('detalhesModal');
-    const allCards = container.querySelectorAll('.destaque-card');
-
-    // Clique abre modal do imóvel correto
-    allCards.forEach((card, idx) => {
-      card.onclick = () => modal.abrir(this.imoveis[idx % this.imoveis.length]);
-    });
-
-    const cardWidth = this.cards[0]?.offsetWidth + 12 || 172;
-    let scrollPos = 0;
-    const totalWidth = cardWidth * this.cards.length;
-
-    // Scroll automático infinito
-    const scrollStep = () => {
-      scrollPos += cardWidth;
-      if (scrollPos >= totalWidth / 2) scrollPos = 0; // reinicia ao chegar no clone
-      container.scrollTo({ left: scrollPos, behavior: 'smooth' });
-    };
-    this.interval = setInterval(scrollStep, 4000);
-
-    // Navegação com setas
-    const left = document.querySelector('.destaque-left');
-    const right = document.querySelector('.destaque-right');
-
-    if (left) left.onclick = () => {
-      scrollPos -= cardWidth;
-      if (scrollPos < 0) scrollPos = totalWidth / 2 - cardWidth;
-      container.scrollTo({ left: scrollPos, behavior: 'smooth' });
-    };
-    if (right) right.onclick = () => {
-      scrollPos += cardWidth;
-      if (scrollPos >= totalWidth / 2) scrollPos = 0;
-      container.scrollTo({ left: scrollPos, behavior: 'smooth' });
-    };
-
-    // Swipe touch
-    let startX = 0, isDragging = false;
-    container.addEventListener('touchstart', e => { startX = e.touches[0].clientX; isDragging = true; });
-    container.addEventListener('touchmove', e => {
-      if (!isDragging) return;
-      const diff = startX - e.touches[0].clientX;
-      if (Math.abs(diff) > 30) {
-        scrollPos += diff > 0 ? cardWidth : -cardWidth;
-        if (scrollPos >= totalWidth / 2) scrollPos = 0;
-        if (scrollPos < 0) scrollPos = totalWidth / 2 - cardWidth;
-        container.scrollTo({ left: scrollPos, behavior: 'smooth' });
-        startX = e.touches[0].clientX;
+    function selecionarMes(idx){
+      indiceSelecionado=idx;
+      const mObj=mesesParaExibir[idx];
+      document.querySelectorAll('#calendario-tabs .tab').forEach(x=>x.classList.remove('active'));
+      const tabAtiva=tabsContainer.children[idx];
+      if(tabAtiva){
+        tabAtiva.classList.add('active');
+        tabAtiva.scrollIntoView({behavior:"smooth",inline:"center"});
       }
-    });
-    container.addEventListener('touchend', () => { isDragging = false; });
-  }
-}
+      renderMes(mObj.mes, mObj.ano);
+    }
 
-    /* ==================== CARREGAR CSV (mantendo base de dados original) ==================== */
-    Papa.parse(csvUrl, { download:true, header:true, complete: res => {
-      // IMPORTANTE: manter a mesma lógica que você já usava — pulo da primeira linha (slice(1)) para manter compatibilidade
-      const allData = res.data.slice(1);
-      const dados = allData.map(i => {
-        i.ref = i.ref || '';
-        i.pet = (i.pet && ['sim','s','1'].includes(i.pet.trim().toLowerCase())) ? 'Sim' : 'Não';
-        i.condominio = (i.cond_incluso && ['sim','s','1'].includes(i.cond_incluso.trim().toLowerCase())) ? 'Sim' : 'Não';
-        i.garagem = i.garagem || '0'; i.titulo = i.titulo || ''; i.descricao = i.descricao || '';
-        i.tipo = i.tipo || ''; i.operacao = i.operacao || ''; i.cidade = i.cidade || '';
-        i.preco = i.preco || '0'; i.area = i.area || '0'; i.banheiros = i.banheiros || '0'; i.quartos = i.quartos || '0';
-        i.imagens = i.imagens || '';
-        return i;
+    btnPrev.onclick=()=>{ selecionarMes((indiceSelecionado-1+12)%12); };
+    btnNext.onclick=()=>{ selecionarMes((indiceSelecionado+1)%12); };
+
+    selecionarMes(0);
+
+    function renderMes(m, a){
+      container.innerHTML='';
+      const diasNoMes=new Date(a, m+1, 0).getDate();
+      const primeiroDiaSemana=new Date(a, m, 1).getDay();
+
+      const mesDiv=document.createElement('div');
+      mesDiv.className='calendario-mes';
+      mesDiv.innerHTML=`<h4 style="text-align:center;">${nomesMeses[m]} ${a}</h4>`;
+
+      const diasContainer=document.createElement('div');
+      diasContainer.className='calendario-container';
+
+      const nomesDias=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+      nomesDias.forEach(dn=>{
+        const cabDia=document.createElement('div');
+        cabDia.className='calendario-dia cabecalho';
+        cabDia.textContent=dn;
+        diasContainer.appendChild(cabDia);
       });
 
-      const modal = new ModalImovel('detalhesModal');
-      const lista = new ListaImoveis('lista', modal);
-      new FiltroImoveis('filtros-container', dados, lista);
-      new TabsImoveis('tabs-container', dados, lista);
-      new OrdenacaoImoveis('ordenacao-container', lista);
+      for(let i=0;i<primeiroDiaSemana;i++){
+        const vazio=document.createElement('div');
+        vazio.className='calendario-dia vazio';
+        diasContainer.appendChild(vazio);
+      }
+
+      for(let d=1;d<=diasNoMes;d++){
+        const diaDiv=document.createElement('div');
+        diaDiv.className='calendario-dia';
+        diaDiv.textContent=d;
+
+        const dataAtual=new Date(a,m,d);
+        const reservado=reservas.some(r=>dataAtual>=r.inicio && dataAtual<=r.fim);
+        diaDiv.classList.add(reservado?'dia-reservado':'dia-disponivel');
+
+        if(!reservado){
+          diaDiv.onclick=()=>{ 
+            diaDiv.classList.toggle('dia-selecionado'); 
+            atualizarWhatsapp(); 
+          }
+        }
+        diasContainer.appendChild(diaDiv);
+      }
+
+      mesDiv.appendChild(diasContainer);
+      container.appendChild(mesDiv);
+    }
+
+    function atualizarWhatsapp(){
+      const selecionados=[];
+      container.querySelectorAll('.dia-selecionado').forEach(el=>{
+        const mesNome = el.closest('.calendario-mes').querySelector('h4').textContent;
+        selecionados.push(`${mesNome} dia ${el.textContent}`);
+      });
+      let btn = document.getElementById('btn-enviar-datas');
+      if(selecionados.length>0){
+        if(!btn){
+          btn = document.createElement('a');
+          btn.id='btn-enviar-datas';
+          btn.className='btn-whatsapp';
+          btn.target='_blank';
+          btn.textContent='Enviar datas por WhatsApp';
+          modalBody.appendChild(btn);
+        }
+        btn.href = `https://api.whatsapp.com/send?phone=5512992468636&text=Imóvel: ${encodeURIComponent(tituloImovel)}. Datas selecionadas: ${encodeURIComponent(selecionados.join(', '))}`;
+      } else if(btn){ btn.remove(); }
+    }
+  }
+}
+
+   Papa.parse(csvUrl,{download:true,header:true,complete:res=>{
+  const allData=res.data.slice(1);
+  const dados=allData.map(i=>{
+    i.ref=i.ref||''; i.aceita_pet=(i.aceita_pet&&['sim','s','1'].includes(i.aceita_pet.trim().toLowerCase()))?'Sim':'Não';
+    i.cond_incluso=(i.cond_incluso&&['sim','s','1'].includes(i.cond_incluso.trim().toLowerCase()))?'Sim':'Não';
+    i.garagem=i.garagem||'0'; i.titulo=i.titulo||''; i.descricao=i.descricao||'';
+    i.tipo=i.tipo||''; i.operacao=i.operacao||''; i.cidade=i.cidade||''; i.endereco=i.endereco||'';
+    i.preco=i.preco||'0'; i.condominio=i.condominio||'0'; i.iptu=i.iptu||'0';
+    i.area=i.area||'0'; i.banheiros=i.banheiros||'0'; i.quartos=i.quartos||'0'; i.imagens=i.imagens||'';
+    return i;
+  });
+
+      const modal=new ModalImovel('detalhesModal');
+      const lista=new ListaImoveis('lista',modal);
+      new FiltroImoveis('filtros-container',dados,lista);
+      new TabsImoveis('tabs-container',dados,lista);
+      new OrdenacaoImoveis('ordenacao-container',lista);
       new Destaques(dados);
-    } });
+
+      // calendário
+      const calendario=gerarCalendarioReservas(dados);
+      const modalCalendario = new ModalCalendario('calendarioModal');
+
+      // sobrescrevendo abrir do modal de imóveis
+      const abrirOriginal=modal.abrir.bind(modal);
+      modal.abrir=function(imovel){
+        abrirOriginal(imovel);
+        if(imovel.operacao==='Aluguel'){
+          const b=document.createElement('button');
+          b.className='btn-ver-disponibilidade';
+          b.textContent='Ver Disponibilidade';
+          b.onclick = () => modalCalendario.abrir(bodyCalendario => {
+          calendario(bodyCalendario, imovel.endereco, imovel.titulo);
+        });
+          modal.body.appendChild(b);
+        }
+      }
+    }});
   </script>
 </body>
 </html>
